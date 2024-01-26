@@ -1,0 +1,3 @@
+[submodule "src/main/java/frc/robot/lib/SmartMotorController"]
+	path = src/main/java/frc/robot/lib/SmartMotorController
+	url = https://github.com/beaver700nh/lib-smartmotorcontroller
