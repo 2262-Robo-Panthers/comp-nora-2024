@@ -10,17 +10,22 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.robot.commands.LaunchCommand;
-import frc.robot.subsystems.LaunchSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
 
 import frc.robot.lib.SmartMotorController.SmartMotorController;
 
-public class RobotContainer {
-  private final CommandXboxController m_driverController = new CommandXboxController(0);
+import frc.robot.Constants.*;
 
-  private final LaunchSubsystem m_launchSubsystem = new LaunchSubsystem(
+public class RobotContainer {
+  private final CommandXboxController m_driverController = new CommandXboxController(
+    OperatorConstants.USB.kDriverControllerPort
+  );
+
+  private final ArmSubsystem m_launchSubsystem = new ArmSubsystem(
     new SmartMotorController(
-      true, 0.8, 0.5,
-      new Spark(0)
+      LaunchConstants.kIsInverted,
+      LaunchConstants.kMaxSpeed,
+      new Spark(LaunchConstants.PWM.kMotorPort)
     )
   );
 
@@ -30,7 +35,11 @@ public class RobotContainer {
   );
 
   public RobotContainer() {
-    m_launchSubsystem.setDefaultCommand(m_launchCommand);
+    m_launchSubsystem.setDefaultCommand(
+      Commands.parallel(
+        m_launchCommand
+      )
+    );
 
     configureBindings();
   }

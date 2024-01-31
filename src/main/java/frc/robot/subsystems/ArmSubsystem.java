@@ -8,14 +8,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.lib.SmartMotorController.SmartMotorController;
 
-public class LaunchSubsystem extends SubsystemBase {
-  SmartMotorController m_controller;
+public class ArmSubsystem extends SubsystemBase {
+  SmartMotorController m_launch;
 
-  public LaunchSubsystem(SmartMotorController controller) {
-    m_controller = controller;
+  public ArmSubsystem(SmartMotorController launch) {
+    m_launch = launch;
   }
 
-  public SmartMotorController getController() {
-    return m_controller;
+  public void setLauncherSpeed(double velocity) {
+    m_launch.forceTo(velocity);
   }
 }

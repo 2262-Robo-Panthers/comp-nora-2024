@@ -8,39 +8,36 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-import frc.robot.subsystems.LaunchSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
 
 public class LaunchCommand extends Command {
-  private final LaunchSubsystem m_launch;
+  private final ArmSubsystem m_arm;
 
   private final Supplier<Double> m_input;
 
-  public LaunchCommand(LaunchSubsystem launch, Supplier<Double> input) {
-    m_launch = launch;
+  public LaunchCommand(ArmSubsystem arm, Supplier<Double> input) {
+    m_arm = arm;
     m_input = input;
 
-    addRequirements(launch);
+    addRequirements(arm);
   }
 
   @Override
   public void initialize() {
-    m_launch.getController().set(0.0);
+    m_arm.setLauncherSpeed(0.0);
   }
 
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_launch.getController().set(m_input.get());
+    m_arm.setLauncherSpeed(m_input.get());
   }
 
-  // Called once the command ends or is interrupted.
   @Override
   @SuppressWarnings("PMD.UnusedFormalParameter")
   public void end(boolean interrupted) {
-    m_launch.getController().set(0.0);
+    m_arm.setLauncherSpeed(0.0);
   }
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
