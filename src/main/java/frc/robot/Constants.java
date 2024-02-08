@@ -7,12 +7,22 @@ public final class Constants {
     }
   }
 
+  public static class IntakeConstants {
+    public static final boolean kIsInverted = false;
+    public static final double kMaxSpeed = 0.3;
+
+    public static class PWM {
+      public static final int kMotorPort = 0;
+    }
+  }
+
   public static class LaunchConstants {
     public static final boolean kIsInverted = true;
     public static final double kMaxSpeed = 0.8;
 
-    public static class PWM {
-      public static final int kMotorPort = 0;
+    public static class CAN {
+      public static final int kMotorPortA = 100;
+      public static final int kMotorPortB = 101;
     }
   }
 }
