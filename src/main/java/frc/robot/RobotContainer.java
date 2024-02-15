@@ -27,8 +27,8 @@ public class RobotContainer {
       IntakeConstants.kIsInverted,
       IntakeConstants.kMaxSpeed,
       (master, follower) -> follower.follow(master),
-      new CANSparkMax(IntakeConstants.CAN.kMotorPortA, MotorType.kBrushless),
-      new CANSparkMax(IntakeConstants.CAN.kMotorPortB, MotorType.kBrushless)
+      new CANSparkMax(IntakeConstants.CAN.kMotorPortA, MotorType.kBrushed),
+      new CANSparkMax(IntakeConstants.CAN.kMotorPortB, MotorType.kBrushed)
     ),
     new SmartMotorControllerGroup<>(
       LaunchConstants.kIsInverted,
