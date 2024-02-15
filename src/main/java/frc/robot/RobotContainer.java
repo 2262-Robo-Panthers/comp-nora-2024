@@ -4,13 +4,14 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 import frc.robot.commands.ArmCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -28,7 +29,7 @@ public class RobotContainer {
     new SmartMotorController(
       IntakeConstants.kIsInverted,
       IntakeConstants.kMaxSpeed,
-      new Spark(IntakeConstants.PWM.kMotorPort)
+      new WPI_VictorSPX(IntakeConstants.PWM.kMotorPort)
     ),
     new SmartMotorControllerGroup<>(
       LaunchConstants.kIsInverted,
