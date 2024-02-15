@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.motorcontrol.VictorSP;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -26,10 +27,13 @@ public class RobotContainer {
   );
 
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem(
+    // Does not work - motor controllers must be same type
     new SmartMotorController(
       IntakeConstants.kIsInverted,
       IntakeConstants.kMaxSpeed,
-      new WPI_VictorSPX(IntakeConstants.PWM.kMotorPort)
+      (master, follower) -> follower.follow(master),
+      new VictorSP(IntakeConstants.PWM.kMotorPortA),
+      new WPI_VictorSPX(IntakeConstants.CAN.kMotorPortB)
     ),
     new SmartMotorControllerGroup<>(
       LaunchConstants.kIsInverted,

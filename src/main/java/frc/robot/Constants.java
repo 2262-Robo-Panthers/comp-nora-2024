@@ -12,7 +12,11 @@ public final class Constants {
     public static final double kMaxSpeed = 0.6;
 
     public static class PWM {
-      public static final int kMotorPort = 3;
+      public static final int kMotorPortA = 0;
+    }
+
+    public static class CAN {
+      public static final int kMotorPortB = 3;
     }
   }
 
