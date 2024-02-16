@@ -13,11 +13,13 @@ import frc.robot.subsystems.ArmSubsystem;
 public class ArmCommand extends Command {
   private final ArmSubsystem m_arm;
 
+  private final Supplier<Double> m_pivot;
   private final Supplier<Double> m_intake;
   private final Supplier<Double> m_launch;
 
-  public ArmCommand(ArmSubsystem arm, Supplier<Double> intake, Supplier<Double> launch) {
+  public ArmCommand(ArmSubsystem arm, Supplier<Double> pivot, Supplier<Double> intake, Supplier<Double> launch) {
     m_arm = arm;
+    m_pivot = pivot;
     m_intake = intake;
     m_launch = launch;
 
@@ -32,6 +34,7 @@ public class ArmCommand extends Command {
 
   @Override
   public void execute() {
+    m_arm.setPivotSpeed_TEMP(m_pivot.get());
     m_arm.setIntakeSpeed(m_intake.get());
     m_arm.setLaunchSpeed(m_launch.get());
   }

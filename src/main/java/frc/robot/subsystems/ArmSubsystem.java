@@ -9,12 +9,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.SmartMotorController.SmartMotorController;
 
 public class ArmSubsystem extends SubsystemBase {
+  SmartMotorController m_pivot;
   SmartMotorController m_intake;
   SmartMotorController m_launch;
 
-  public ArmSubsystem(SmartMotorController intake, SmartMotorController launch) {
+  public ArmSubsystem(SmartMotorController pivot, SmartMotorController intake, SmartMotorController launch) {
+    m_pivot = pivot;
     m_intake = intake;
     m_launch = launch;
+  }
+
+  public void setPivotSpeed_TEMP(double velocity) {
+    m_pivot.forceTo(velocity);
   }
 
   public void setIntakeSpeed(double velocity) {

@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.controls.Follower;
+
 import frc.robot.commands.ArmCommand;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -23,6 +26,13 @@ public class RobotContainer {
   );
 
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem(
+    new SmartMotorControllerGroup<>(
+      PivotConstants.kIsInverted,
+      PivotConstants.kMaxSpeed,
+      (master, follower) -> follower.setControl(new Follower(master.getDeviceID(), false)),
+      new TalonFX(PivotConstants.CAN.kMotorPortA),
+      new TalonFX(PivotConstants.CAN.kMotorPortB)
+    ),
     new SmartMotorControllerGroup<>(
       IntakeConstants.kIsInverted,
       IntakeConstants.kMaxSpeed,
@@ -41,6 +51,7 @@ public class RobotContainer {
 
   private final ArmCommand m_armCommand = new ArmCommand(
     m_armSubsystem,
+    () -> m_driverController.getRightTriggerAxis() - m_driverController.getLeftTriggerAxis(),
     m_driverController::getRightY,
     m_driverController::getLeftY
   );
