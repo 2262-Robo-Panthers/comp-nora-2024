@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.revrobotics.CANSparkMax;
@@ -67,7 +68,9 @@ public class RobotContainer {
     setupOrchestra();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    m_driverController.start().onTrue(new InstantCommand(this::queueMusic, m_armSubsystem));
+  }
 
   private void setupOrchestra() {
     m_orchestra = new Orchestra("happy-birthday.chrp");
