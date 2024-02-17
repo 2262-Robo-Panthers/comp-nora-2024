@@ -29,7 +29,7 @@ public final class Constants {
 
   public static class LaunchConstants {
     public static final boolean kIsInverted = false;
-    public static final double kMaxSpeed = 0.8;
+    public static final double kMaxSpeed = 1.0;
 
     public static class CAN {
       public static final int kMotorPortA = 5;
