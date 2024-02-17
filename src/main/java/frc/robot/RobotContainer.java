@@ -4,16 +4,13 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.Follower;
 
@@ -58,32 +55,24 @@ public class RobotContainer {
     m_driverController::getLeftY
   );
 
-  private Orchestra m_orchestra;
+  private final ChirpController m_chirpController = new ChirpController(
+    m_armSubsystem,
+    "happy-birthday",
+    "mary-had-a-little-lamb",
+    "twinkle-twinkle",
+    "jingle-bells",
+    "star-spangled-banner"
+  );
 
   public RobotContainer() {
     m_armSubsystem.setDefaultCommand(m_armCommand);
 
     configureBindings();
-
-    setupOrchestra();
   }
 
   private void configureBindings() {
-    m_driverController.start().onTrue(new InstantCommand(this::queueMusic, m_armSubsystem));
-  }
-
-  private void setupOrchestra() {
-    m_orchestra = new Orchestra("happy-birthday.chrp");
-
-    for (MotorController controller : ((SmartMotorControllerGroup<TalonFX>) m_armSubsystem.getPivot()).getControllers()) {
-      m_orchestra.addInstrument((TalonFX) controller);
-    }
-  }
-
-  public void queueMusic() {
-    if (!m_orchestra.isPlaying()) {
-      m_orchestra.play();
-    }
+    m_driverController.start().onTrue(m_chirpController.getNextSongCommand());
+    m_driverController.back().onTrue(m_chirpController.getStopCommand());
   }
 
   public Command getAutonomousCommand() {
