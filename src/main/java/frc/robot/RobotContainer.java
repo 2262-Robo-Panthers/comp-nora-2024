@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -11,18 +12,18 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.Follower;
 
 import frc.robot.commands.ArmCommand;
 import frc.robot.subsystems.ArmSubsystem;
-
 import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
 import frc.robot.Constants.*;
 
 public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(
-    OperatorConstants.USB.kDriverControllerPort
+    OIConstants.USB.kDriverControllerPort
   );
 
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem(
@@ -56,13 +57,31 @@ public class RobotContainer {
     m_driverController::getLeftY
   );
 
+  private Orchestra m_orchestra;
+
   public RobotContainer() {
     m_armSubsystem.setDefaultCommand(m_armCommand);
 
     configureBindings();
+
+    setupOrchestra();
   }
 
   private void configureBindings() {}
+
+  private void setupOrchestra() {
+    m_orchestra = new Orchestra("happy-birthday.chrp");
+
+    for (MotorController controller : ((SmartMotorControllerGroup<TalonFX>) m_armSubsystem.getPivot()).getControllers()) {
+      m_orchestra.addInstrument((TalonFX) controller);
+    }
+  }
+
+  public void queueMusic() {
+    if (!m_orchestra.isPlaying()) {
+      m_orchestra.play();
+    }
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");

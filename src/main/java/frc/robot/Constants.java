@@ -1,7 +1,7 @@
 package frc.robot;
 
 public final class Constants {
-  public static class OperatorConstants {
+  public static class OIConstants {
     public static class USB {
       public static final int kDriverControllerPort = 0;
     }

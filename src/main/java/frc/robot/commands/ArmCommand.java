@@ -28,8 +28,7 @@ public class ArmCommand extends Command {
 
   @Override
   public void initialize() {
-    m_arm.setIntakeSpeed(0.0);
-    m_arm.setLaunchSpeed(0.0);
+    m_arm.stop();
   }
 
   @Override
@@ -42,8 +41,7 @@ public class ArmCommand extends Command {
   @Override
   @SuppressWarnings("PMD.UnusedFormalParameter")
   public void end(boolean interrupted) {
-    m_arm.setIntakeSpeed(0.0);
-    m_arm.setLaunchSpeed(0.0);
+    m_arm.stop();
   }
 
   @Override

@@ -30,4 +30,22 @@ public class ArmSubsystem extends SubsystemBase {
   public void setLaunchSpeed(double velocity) {
     m_launch.forceTo(velocity);
   }
+
+  public void stop() {
+    m_pivot.forceTo(0.0);
+    m_intake.forceTo(0.0);
+    m_launch.forceTo(0.0);
+  }
+
+  public SmartMotorController getPivot() {
+    return m_pivot;
+  }
+
+  public SmartMotorController getIntake() {
+    return m_intake;
+  }
+
+  public SmartMotorController getLaunch() {
+    return m_launch;
+  }
 }
