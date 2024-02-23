@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.Follower;
 
@@ -55,13 +56,24 @@ public class RobotContainer {
     m_driverController::getLeftY
   );
 
+  private final Orchestra m_orchestra = new Orchestra();
+
+  private final ChirpController m_sfxController = new ChirpController(
+    m_armSubsystem,
+    m_orchestra,
+    "game-sounds/start-auto",
+    "game-sounds/start-teleop",
+    "game-sounds/match-end"
+  );
+
   private final ChirpController m_chirpController = new ChirpController(
     m_armSubsystem,
-    "happy-birthday",
-    "mary-had-a-little-lamb",
-    "twinkle-twinkle",
-    "jingle-bells",
-    "star-spangled-banner"
+    m_orchestra,
+    "music/happy-birthday",
+    "music/mary-had-a-little-lamb",
+    "music/twinkle-twinkle",
+    "music/jingle-bells",
+    "music/star-spangled-banner"
   );
 
   public RobotContainer() {
@@ -71,8 +83,13 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    m_driverController.start().onTrue(m_chirpController.getNextSongCommand());
-    m_driverController.back().onTrue(m_chirpController.getStopCommand());
+    m_driverController.start().onTrue(m_chirpController.getSongSelectCommand(i -> i + 1));
+    m_driverController.back().onTrue(m_chirpController.getSongSelectCommand(i -> i - 1));
+    m_driverController.y().onTrue(m_chirpController.getPlayPauseCommand());
+
+    m_driverController.x().onTrue(m_sfxController.getSongPlayCommand(__ -> 0));
+    m_driverController.a().onTrue(m_sfxController.getSongPlayCommand(__ -> 1));
+    m_driverController.b().onTrue(m_sfxController.getSongPlayCommand(__ -> 2));
   }
 
   public Command getAutonomousCommand() {
