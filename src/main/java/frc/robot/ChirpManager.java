@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import java.util.function.IntUnaryOperator;
+import java.util.function.UnaryOperator;
 
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -41,14 +41,14 @@ public class ChirpManager {
     m_orchestra.loadMusic(m_songs[m_currentSong] + ".chrp");
   }
 
-  public Command getSongSelectCommand(IntUnaryOperator indexCalculator) {
+  public Command getSongSelectCommand(UnaryOperator<Integer> indexCalculator) {
     return new InstantCommand(
       () -> {
         if (m_orchestra.isPlaying()) {
           m_orchestra.stop();
         }
 
-        m_currentSong = indexCalculator.applyAsInt(m_currentSong);
+        m_currentSong = indexCalculator.apply(m_currentSong);
 
         if (m_currentSong >= m_songs.length) {
           m_currentSong = 0;
@@ -63,7 +63,7 @@ public class ChirpManager {
     );
   }
 
-  public Command getSongPlayCommand(IntUnaryOperator indexCalculator) {
+  public Command getSongPlayCommand(UnaryOperator<Integer> indexCalculator) {
     return new SequentialCommandGroup(
       getSongSelectCommand(indexCalculator),
       getPlayPauseCommand()

@@ -4,6 +4,8 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 public final class Constants {
   public static class OIConstants {
+    public static final double kDeadband = 0.1;
+
     public static class USB {
       public static final int kDriverControllerPort = 0;
       public static final int kEndEffectorControllerPort = 1;

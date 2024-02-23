@@ -5,10 +5,13 @@
 package frc.robot.commands;
 
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.util.FunctionalUtil;
 import frc.robot.Constants.DriveConstants;
 
 // TEMP
@@ -22,23 +25,25 @@ public class DriveCommand extends Command {
   private final Supplier<Double> m_strafeX;
   private final Supplier<Double> m_rotation;
 
-  public DriveCommand(DriveSubsystem drive, Supplier<Double> strafeY, Supplier<Double> strafeX, Supplier<Double> rotation) {
+  public DriveCommand(DriveSubsystem drive, Supplier<Double> strafeY, Supplier<Double> strafeX, Supplier<Double> rotation, double deadband) {
     m_drive = drive;
-    m_strafeY = strafeY;
-    m_strafeX = strafeX;
-    m_rotation = rotation;
+
+    UnaryOperator<Double> deadbandify = i -> MathUtil.applyDeadband(i, deadband);
+    m_strafeY = FunctionalUtil.supplyThenOperate(strafeY, deadbandify);
+    m_strafeX = FunctionalUtil.supplyThenOperate(strafeX, deadbandify);
+    m_rotation = FunctionalUtil.supplyThenOperate(rotation, deadbandify);
 
     addRequirements(drive);
   }
 
   @Override
   public void initialize() {
-    m_drive.m_modules[0].freeze();
+    m_drive.zeroVelocity();
   }
 
   @Override
   public void execute() {
-    m_drive.m_modules[0].setDesiredState(
+    m_drive.setDesiredStates_TEMP(
       new SwerveModuleState(
         -m_strafeY.get() * DriveConstants.kMaxSpeed_m_s,
         new Rotation2d(
@@ -51,7 +56,7 @@ public class DriveCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    m_drive.m_modules[0].freeze();
+    m_drive.zeroVelocity();
   }
 
   @Override

@@ -34,6 +34,21 @@ public class RobotContainer {
       Constants.DriveConstants.CAN.kMotorPort(Fr, Rt, Dv),
       Constants.DriveConstants.CAN.kMotorPort(Fr, Rt, Tn),
       Constants.DriveConstants.kSwerveModuleAngularOffset(Fr, Rt)
+    ),
+    new MAXSwerveModule(
+      Constants.DriveConstants.CAN.kMotorPort(Fr, Lf, Dv),
+      Constants.DriveConstants.CAN.kMotorPort(Fr, Lf, Tn),
+      Constants.DriveConstants.kSwerveModuleAngularOffset(Fr, Lf)
+    ),
+    new MAXSwerveModule(
+      Constants.DriveConstants.CAN.kMotorPort(Bk, Rt, Dv),
+      Constants.DriveConstants.CAN.kMotorPort(Bk, Rt, Tn),
+      Constants.DriveConstants.kSwerveModuleAngularOffset(Bk, Rt)
+    ),
+    new MAXSwerveModule(
+      Constants.DriveConstants.CAN.kMotorPort(Bk, Lf, Dv),
+      Constants.DriveConstants.CAN.kMotorPort(Bk, Lf, Tn),
+      Constants.DriveConstants.kSwerveModuleAngularOffset(Bk, Lf)
     )
   );
 
@@ -41,7 +56,8 @@ public class RobotContainer {
     m_driveSubsystem,
     m_driverController::getLeftY,
     m_driverController::getLeftX,
-    m_driverController::getRightX
+    m_driverController::getRightX,
+    OIConstants.kDeadband
   );
 
   private final CommandXboxController m_endEffectorController = new CommandXboxController(
