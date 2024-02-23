@@ -6,6 +6,46 @@ public final class Constants {
   public static class OIConstants {
     public static class USB {
       public static final int kDriverControllerPort = 0;
+      public static final int kEndEffectorControllerPort = 1;
+    }
+  }
+
+  public static class DriveConstants {
+    public static final double kMaxSpeed_m_s = 2.4;
+
+    static final double[] kSwerveModuleAngularOffsets = {
+      0, -Math.PI / 2, Math.PI / 2, Math.PI
+    };
+
+    public static double kSwerveModuleAngularOffset(int backNotFront, int LeftNotRight) {
+      assert backNotFront == 0 || backNotFront == 1;
+      assert LeftNotRight == 0 || LeftNotRight == 1;
+
+      return kSwerveModuleAngularOffsets
+        [ backNotFront << 1
+        | LeftNotRight << 0 ];
+    }
+
+    public static class CAN {
+      public static int kMotorPort(int backNotFront, int LeftNotRight, int driveNotTurn) {
+        assert backNotFront == 0 || backNotFront == 1;
+        assert LeftNotRight == 0 || LeftNotRight == 1;
+        assert driveNotTurn == 0 || driveNotTurn == 1;
+
+        return 20 +
+          ( backNotFront << 2
+          | LeftNotRight << 1
+          | driveNotTurn << 0 );
+      }
+    }
+
+    public static class ModuleId {
+      public static final int Fr = 0; // front
+      public static final int Bk = 1; // back
+      public static final int Rt = 0; // right
+      public static final int Lf = 1; // left
+      public static final int Dv = 0; // drive
+      public static final int Tn = 1; // turn
     }
   }
 
@@ -99,7 +139,7 @@ public final class Constants {
     public static final IdleMode kDriveMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurnMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDriveMotorCurrentLimit_A = 50;
-    public static final int kTurnMotorCurrentLimit_A = 20;
+    public static final int kDriveMotorCurrentLimit_A = 40;
+    public static final int kTurnMotorCurrentLimit_A = 30;
   }
 }

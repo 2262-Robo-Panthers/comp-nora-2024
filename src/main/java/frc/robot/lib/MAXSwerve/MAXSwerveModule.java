@@ -118,8 +118,10 @@ public class MAXSwerveModule {
   public SwerveModuleState getState() {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
-    return new SwerveModuleState(m_drivingEncoder.getVelocity(),
-        new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
+    return new SwerveModuleState(
+      m_drivingEncoder.getVelocity(),
+      new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset)
+    );
   }
 
   /**
@@ -131,8 +133,9 @@ public class MAXSwerveModule {
     // Apply chassis angular offset to the encoder position to get the position
     // relative to the chassis.
     return new SwerveModulePosition(
-        m_drivingEncoder.getPosition(),
-        new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset));
+      m_drivingEncoder.getPosition(),
+      new Rotation2d(m_turningEncoder.getPosition() - m_chassisAngularOffset)
+    );
   }
 
   /**
@@ -147,8 +150,10 @@ public class MAXSwerveModule {
     correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(m_chassisAngularOffset));
 
     // Optimize the reference state to avoid spinning further than 90 degrees.
-    SwerveModuleState optimizedDesiredState = SwerveModuleState.optimize(correctedDesiredState,
-        new Rotation2d(m_turningEncoder.getPosition()));
+    SwerveModuleState optimizedDesiredState = SwerveModuleState.optimize(
+      correctedDesiredState,
+      new Rotation2d(m_turningEncoder.getPosition())
+    );
 
     // Command driving and turning SPARKS MAX towards their respective setpoints.
     m_drivingPIDController.setReference(optimizedDesiredState.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
@@ -160,5 +165,12 @@ public class MAXSwerveModule {
   /** Zeroes all the SwerveModule encoders. */
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
+  }
+
+  /** Freezes the SwerveModule in place. */
+  public void freeze() {
+    SwerveModuleState currentState = getState();
+    m_drivingPIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
+    m_turningPIDController.setReference(currentState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
   }
 }

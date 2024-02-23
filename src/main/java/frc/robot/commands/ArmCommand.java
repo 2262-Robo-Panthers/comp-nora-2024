@@ -39,7 +39,6 @@ public class ArmCommand extends Command {
   }
 
   @Override
-  @SuppressWarnings("PMD.UnusedFormalParameter")
   public void end(boolean interrupted) {
     m_arm.stop();
   }

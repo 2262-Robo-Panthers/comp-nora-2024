@@ -6,8 +6,12 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import frc.robot.lib.MAXSwerve.MAXSwerveModule;
+
 public class DriveSubsystem extends SubsystemBase {
-  public DriveSubsystem() {
-    //ssssssssssssssssssssssssssssssssssssssssssssssssss
+  public final MAXSwerveModule[] m_modules;
+
+  public DriveSubsystem(MAXSwerveModule... modules) {
+    m_modules = modules;
   }
 }

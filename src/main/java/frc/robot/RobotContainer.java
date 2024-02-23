@@ -16,13 +16,36 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.Follower;
 
 import frc.robot.commands.ArmCommand;
+import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
 import frc.robot.Constants.*;
+import static frc.robot.Constants.DriveConstants.ModuleId.*;
 
 public class RobotContainer {
   private final CommandXboxController m_driverController = new CommandXboxController(
     OIConstants.USB.kDriverControllerPort
+  );
+
+  private final DriveSubsystem m_driveSubsystem = new DriveSubsystem(
+    new MAXSwerveModule(
+      Constants.DriveConstants.CAN.kMotorPort(Fr, Rt, Dv),
+      Constants.DriveConstants.CAN.kMotorPort(Fr, Rt, Tn),
+      Constants.DriveConstants.kSwerveModuleAngularOffset(Fr, Rt)
+    )
+  );
+
+  private final Command m_driveCommand = new DriveCommand(
+    m_driveSubsystem,
+    m_driverController::getLeftY,
+    m_driverController::getLeftX,
+    m_driverController::getRightX
+  );
+
+  private final CommandXboxController m_endEffectorController = new CommandXboxController(
+    OIConstants.USB.kEndEffectorControllerPort
   );
 
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem(
@@ -51,14 +74,14 @@ public class RobotContainer {
 
   private final ArmCommand m_armCommand = new ArmCommand(
     m_armSubsystem,
-    () -> m_driverController.getRightTriggerAxis() - m_driverController.getLeftTriggerAxis(),
-    m_driverController::getRightY,
-    m_driverController::getLeftY
+    () -> m_endEffectorController.getRightTriggerAxis() - m_endEffectorController.getLeftTriggerAxis(),
+    m_endEffectorController::getRightY,
+    m_endEffectorController::getLeftY
   );
 
   private final Orchestra m_orchestra = new Orchestra();
 
-  private final ChirpController m_sfxController = new ChirpController(
+  private final ChirpManager m_sfxManager = new ChirpManager(
     m_armSubsystem,
     m_orchestra,
     "game-sounds/start-auto",
@@ -66,7 +89,7 @@ public class RobotContainer {
     "game-sounds/match-end"
   );
 
-  private final ChirpController m_chirpController = new ChirpController(
+  private final ChirpManager m_chirpManager = new ChirpManager(
     m_armSubsystem,
     m_orchestra,
     "music/happy-birthday",
@@ -77,19 +100,20 @@ public class RobotContainer {
   );
 
   public RobotContainer() {
+    m_driveSubsystem.setDefaultCommand(m_driveCommand);
     m_armSubsystem.setDefaultCommand(m_armCommand);
 
     configureBindings();
   }
 
   private void configureBindings() {
-    m_driverController.start().onTrue(m_chirpController.getSongSelectCommand(i -> i + 1));
-    m_driverController.back().onTrue(m_chirpController.getSongSelectCommand(i -> i - 1));
-    m_driverController.y().onTrue(m_chirpController.getPlayPauseCommand());
+    m_endEffectorController.start().onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));
+    m_endEffectorController.back().onTrue(m_chirpManager.getSongSelectCommand(i -> i - 1));
+    m_endEffectorController.y().onTrue(m_chirpManager.getPlayPauseCommand());
 
-    m_driverController.x().onTrue(m_sfxController.getSongPlayCommand(__ -> 0));
-    m_driverController.a().onTrue(m_sfxController.getSongPlayCommand(__ -> 1));
-    m_driverController.b().onTrue(m_sfxController.getSongPlayCommand(__ -> 2));
+    m_endEffectorController.x().onTrue(m_sfxManager.getSongPlayCommand(__ -> 0));
+    m_endEffectorController.a().onTrue(m_sfxManager.getSongPlayCommand(__ -> 1));
+    m_endEffectorController.b().onTrue(m_sfxManager.getSongPlayCommand(__ -> 2));
   }
 
   public Command getAutonomousCommand() {

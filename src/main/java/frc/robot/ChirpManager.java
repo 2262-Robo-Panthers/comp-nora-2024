@@ -17,7 +17,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
 
-public class ChirpController {
+public class ChirpManager {
   private final ArmSubsystem m_arm;
 
   private final Orchestra m_orchestra;
@@ -25,7 +25,7 @@ public class ChirpController {
   private final String[] m_songs;
   private int m_currentSong = 0;
 
-  public ChirpController(ArmSubsystem arm, Orchestra orchestra, String... songs) {
+  public ChirpManager(ArmSubsystem arm, Orchestra orchestra, String... songs) {
     m_arm = arm;
     m_orchestra = orchestra;
     m_songs = songs;
