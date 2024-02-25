@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.revrobotics.CANSparkMax;
@@ -123,6 +124,8 @@ public class RobotContainer {
   );
 
   public RobotContainer() {
+    m_driveSubsystem.setReferencePlane(false);
+
     m_driveSubsystem.setDefaultCommand(m_driveCommand);
     m_armSubsystem.setDefaultCommand(m_armCommand);
 
@@ -130,13 +133,22 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    m_endEffectorController.start().onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));
-    m_endEffectorController.back().onTrue(m_chirpManager.getSongSelectCommand(i -> i - 1));
-    m_endEffectorController.y().onTrue(m_chirpManager.getPlayPauseCommand());
+    m_driverController.x()
+      .whileTrue(new RunCommand(m_driveSubsystem::doXFormation, m_driveSubsystem));
 
-    m_endEffectorController.x().onTrue(m_sfxManager.getSongPlayCommand(__ -> 0));
-    m_endEffectorController.a().onTrue(m_sfxManager.getSongPlayCommand(__ -> 1));
-    m_endEffectorController.b().onTrue(m_sfxManager.getSongPlayCommand(__ -> 2));
+    m_endEffectorController.start()
+      .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));
+    m_endEffectorController.back()
+      .onTrue(m_chirpManager.getSongSelectCommand(i -> i - 1));
+    m_endEffectorController.y()
+      .onTrue(m_chirpManager.getPlayPauseCommand());
+
+    m_endEffectorController.x()
+      .onTrue(m_sfxManager.getSongPlayCommand(__ -> 0));
+    m_endEffectorController.a()
+      .onTrue(m_sfxManager.getSongPlayCommand(__ -> 1));
+    m_endEffectorController.b()
+      .onTrue(m_sfxManager.getSongPlayCommand(__ -> 2));
   }
 
   public Command getAutonomousCommand() {

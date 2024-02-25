@@ -33,7 +33,7 @@ public class DriveCommand extends Command {
 
   @Override
   public void initialize() {
-    m_drive.zeroVelocity();
+    m_drive.doXFormation();
   }
 
   @Override
@@ -43,7 +43,7 @@ public class DriveCommand extends Command {
 
   @Override
   public void end(boolean interrupted) {
-    m_drive.zeroVelocity();
+    m_drive.doXFormation();
   }
 
   @Override

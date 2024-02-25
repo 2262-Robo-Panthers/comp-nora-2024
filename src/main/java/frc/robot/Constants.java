@@ -31,10 +31,10 @@ public final class Constants {
 
     // Values are offset by 1/2 to center the robot on the origin
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-      new Translation2d(+kTrackLength / 2, +kTrackWidth / 2),
       new Translation2d(+kTrackLength / 2, -kTrackWidth / 2),
-      new Translation2d(-kTrackLength / 2, +kTrackWidth / 2),
-      new Translation2d(-kTrackLength / 2, -kTrackWidth / 2)
+      new Translation2d(+kTrackLength / 2, +kTrackWidth / 2),
+      new Translation2d(-kTrackLength / 2, -kTrackWidth / 2),
+      new Translation2d(-kTrackLength / 2, +kTrackWidth / 2)
     );
 
     static final double[] kSwerveModuleAngularOffsets = {

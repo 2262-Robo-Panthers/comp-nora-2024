@@ -166,11 +166,4 @@ public class MAXSwerveModule {
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
   }
-
-  /** Freezes the SwerveModule in place. */
-  public void freeze() {
-    SwerveModuleState currentState = getState();
-    m_drivingPIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
-    m_turningPIDController.setReference(currentState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
-  }
 }

@@ -42,7 +42,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
-  private boolean m_isFieldRelative;
+  private boolean m_isFieldRelative = false;
 
   private final double m_maxSpeedLin;
   private final double m_maxSpeedAng;
@@ -62,9 +62,9 @@ public class DriveSubsystem extends SubsystemBase {
     m_limiterRotation = new SlewRateLimiter(slewRateRotation);
     m_slewRateDirection = slewRateDirection;
 
+    m_modules = modules;
     m_odometry = new SwerveDriveOdometry(driveKinematics, getRotation(), getModulePositions());
     m_driveKinematics = driveKinematics;
-    m_modules = modules;
   }
 
   @Override
@@ -105,12 +105,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_modules[ModuleId.toIndex(Bk, Rt)].setDesiredState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(+45.0)));
   }
 
-  public void zeroVelocity() {
-    for (MAXSwerveModule module : m_modules) {
-      module.freeze();
-    }
-  }
-
   public void resetEncoders() {
     for (MAXSwerveModule module : m_modules) {
       module.resetEncoders();
@@ -134,21 +128,22 @@ public class DriveSubsystem extends SubsystemBase {
   /**
    * Drive the robot using joystick inputs.
    *
-   * @param xSpeed   Speed of the robot in the oblique direction (forwards)
-   * @param ySpeed   Speed of the robot in the lateral direction (sideways)
-   * @param rotSpeed Turn rate of the robot.
+   * @param xInput   Speed of the robot in the oblique direction (forwards)
+   * @param yInput   Speed of the robot in the lateral direction (sideways)
+   * @param rotInput Turn rate of the robot.
    */
   public void drive(double xInput, double yInput, double rotInput) {
-    Pose2d processedInput = applyRateLimiting(xInput, yInput, rotInput);
+    Pose2d processedInput = new Pose2d(xInput, yInput, new Rotation2d(rotInput));
+    // Pose2d processedInput = applyRateLimiting(xInput, yInput, rotInput);
 
     double xSpeed = processedInput.getX() * m_maxSpeedLin;
     double ySpeed = processedInput.getY() * m_maxSpeedLin;
-    double rot = processedInput.getRotation().getRadians() * m_maxSpeedAng; // fake radians, see #applyRateLimiting
+    double rotSpeed = processedInput.getRotation().getRadians() * m_maxSpeedAng; // fake radians, see #applyRateLimiting
 
     SwerveModuleState[] states = m_driveKinematics.toSwerveModuleStates(
       m_isFieldRelative
-        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, getRotation())
-        : new ChassisSpeeds(xSpeed, ySpeed, rot)
+        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getRotation())
+        : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)
     );
 
     setModuleStates(states);
