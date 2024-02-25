@@ -124,7 +124,7 @@ public class RobotContainer {
   );
 
   public RobotContainer() {
-    m_driveSubsystem.setReferencePlane(false);
+    m_driveSubsystem.setReferencePlane(true);
 
     m_driveSubsystem.setDefaultCommand(m_driveCommand);
     m_armSubsystem.setDefaultCommand(m_armCommand);

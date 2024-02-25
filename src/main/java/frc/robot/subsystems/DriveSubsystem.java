@@ -133,8 +133,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rotInput Turn rate of the robot.
    */
   public void drive(double xInput, double yInput, double rotInput) {
-    Pose2d processedInput = new Pose2d(xInput, yInput, new Rotation2d(rotInput));
-    // Pose2d processedInput = applyRateLimiting(xInput, yInput, rotInput);
+    // Pose2d processedInput = new Pose2d(xInput, yInput, new Rotation2d(rotInput));
+    Pose2d processedInput = applyRateLimiting(xInput, yInput, rotInput);
 
     double xSpeed = processedInput.getX() * m_maxSpeedLin;
     double ySpeed = processedInput.getY() * m_maxSpeedLin;
@@ -191,7 +191,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     // Bundle up values for returning
     return new Pose2d(
-      new Translation2d(m_currentMovementMag, m_currentMovementDir),
+      new Translation2d(m_currentMovementMag, new Rotation2d(m_currentMovementDir)),
       new Rotation2d(m_limiterRotation.calculate(rotInput)) // not actually radians
     );
   }
