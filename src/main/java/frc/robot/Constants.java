@@ -28,10 +28,12 @@ public final class Constants {
 
     public static final double kTrackWidth  = Units.inchesToMeters(25.0); // Distance between left and right wheels
     public static final double kTrackLength = Units.inchesToMeters(24.5); // Distance between front and back wheels
+
+    // Values are offset by 1/2 to center the robot on the origin
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-      new Translation2d(kTrackLength / 2, kTrackWidth / 2),
-      new Translation2d(kTrackLength / 2, -kTrackWidth / 2),
-      new Translation2d(-kTrackLength / 2, kTrackWidth / 2),
+      new Translation2d(+kTrackLength / 2, +kTrackWidth / 2),
+      new Translation2d(+kTrackLength / 2, -kTrackWidth / 2),
+      new Translation2d(-kTrackLength / 2, +kTrackWidth / 2),
       new Translation2d(-kTrackLength / 2, -kTrackWidth / 2)
     );
 
