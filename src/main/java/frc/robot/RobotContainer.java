@@ -30,25 +30,32 @@ public class RobotContainer {
   );
 
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem(
+    DriveConstants.kMaxSpeedLin_m_s,
+    DriveConstants.kMaxSpeedAng_rad_s,
+    DriveConstants.kIsGyroReversed,
+    DriveConstants.kSlewRateMovement,
+    DriveConstants.kSlewRateDirection,
+    DriveConstants.kSlewRateRotation,
+    DriveConstants.kDriveKinematics,
     new MAXSwerveModule(
-      Constants.DriveConstants.CAN.kMotorPort(Fr, Rt, Dv),
-      Constants.DriveConstants.CAN.kMotorPort(Fr, Rt, Tn),
-      Constants.DriveConstants.kSwerveModuleAngularOffset(Fr, Rt)
+      DriveConstants.CAN.kMotorPort(Fr, Rt, Dv),
+      DriveConstants.CAN.kMotorPort(Fr, Rt, Tn),
+      DriveConstants.kSwerveModuleAngularOffset(Fr, Rt)
     ),
     new MAXSwerveModule(
-      Constants.DriveConstants.CAN.kMotorPort(Fr, Lf, Dv),
-      Constants.DriveConstants.CAN.kMotorPort(Fr, Lf, Tn),
-      Constants.DriveConstants.kSwerveModuleAngularOffset(Fr, Lf)
+      DriveConstants.CAN.kMotorPort(Fr, Lf, Dv),
+      DriveConstants.CAN.kMotorPort(Fr, Lf, Tn),
+      DriveConstants.kSwerveModuleAngularOffset(Fr, Lf)
     ),
     new MAXSwerveModule(
-      Constants.DriveConstants.CAN.kMotorPort(Bk, Rt, Dv),
-      Constants.DriveConstants.CAN.kMotorPort(Bk, Rt, Tn),
-      Constants.DriveConstants.kSwerveModuleAngularOffset(Bk, Rt)
+      DriveConstants.CAN.kMotorPort(Bk, Rt, Dv),
+      DriveConstants.CAN.kMotorPort(Bk, Rt, Tn),
+      DriveConstants.kSwerveModuleAngularOffset(Bk, Rt)
     ),
     new MAXSwerveModule(
-      Constants.DriveConstants.CAN.kMotorPort(Bk, Lf, Dv),
-      Constants.DriveConstants.CAN.kMotorPort(Bk, Lf, Tn),
-      Constants.DriveConstants.kSwerveModuleAngularOffset(Bk, Lf)
+      DriveConstants.CAN.kMotorPort(Bk, Lf, Dv),
+      DriveConstants.CAN.kMotorPort(Bk, Lf, Tn),
+      DriveConstants.kSwerveModuleAngularOffset(Bk, Lf)
     )
   );
 

@@ -12,25 +12,20 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.util.FunctionalUtil;
-import frc.robot.Constants.DriveConstants;
-
-// TEMP
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class DriveCommand extends Command {
   private final DriveSubsystem m_drive;
 
-  private final Supplier<Double> m_strafeY;
   private final Supplier<Double> m_strafeX;
+  private final Supplier<Double> m_strafeY;
   private final Supplier<Double> m_rotation;
 
-  public DriveCommand(DriveSubsystem drive, Supplier<Double> strafeY, Supplier<Double> strafeX, Supplier<Double> rotation, double deadband) {
+  public DriveCommand(DriveSubsystem drive, Supplier<Double> strafeX, Supplier<Double> strafeY, Supplier<Double> rotation, double deadband) {
     m_drive = drive;
 
-    UnaryOperator<Double> deadbandify = i -> MathUtil.applyDeadband(i, deadband);
-    m_strafeY = FunctionalUtil.supplyThenOperate(strafeY, deadbandify);
+    UnaryOperator<Double> deadbandify = i -> 0 - MathUtil.applyDeadband(i, deadband);
     m_strafeX = FunctionalUtil.supplyThenOperate(strafeX, deadbandify);
+    m_strafeY = FunctionalUtil.supplyThenOperate(strafeY, deadbandify);
     m_rotation = FunctionalUtil.supplyThenOperate(rotation, deadbandify);
 
     addRequirements(drive);
@@ -43,15 +38,7 @@ public class DriveCommand extends Command {
 
   @Override
   public void execute() {
-    m_drive.setDesiredStates_TEMP(
-      new SwerveModuleState(
-        -m_strafeY.get() * DriveConstants.kMaxSpeed_m_s,
-        new Rotation2d(
-          -m_rotation.get()
-            * 0.5 * Math.PI
-        )
-      )
-    );
+    m_drive.drive(m_strafeX.get(), m_strafeY.get(), m_rotation.get());
   }
 
   @Override

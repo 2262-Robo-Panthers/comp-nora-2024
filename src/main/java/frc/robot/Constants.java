@@ -1,5 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.util.Units;
+
 import com.revrobotics.CANSparkBase.IdleMode;
 
 public final class Constants {
@@ -13,31 +17,37 @@ public final class Constants {
   }
 
   public static class DriveConstants {
-    public static final double kMaxSpeed_m_s = 2.4;
+    public static final double kMaxSpeedLin_m_s = 2.4;
+    public static final double kMaxSpeedAng_rad_s = 2 * Math.PI;
+
+    public static final double kSlewRateMovement = 1.8;  // 180 %/s
+    public static final double kSlewRateDirection = 1.2; // 1.2 rad/s
+    public static final double kSlewRateRotation = 2.0;  // 200 %/s
+
+    public static final boolean kIsGyroReversed = false;
+
+    public static final double kTrackWidth  = Units.inchesToMeters(25.0); // Distance between left and right wheels
+    public static final double kTrackLength = Units.inchesToMeters(24.5); // Distance between front and back wheels
+    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
+      new Translation2d(kTrackLength / 2, kTrackWidth / 2),
+      new Translation2d(kTrackLength / 2, -kTrackWidth / 2),
+      new Translation2d(-kTrackLength / 2, kTrackWidth / 2),
+      new Translation2d(-kTrackLength / 2, -kTrackWidth / 2)
+    );
 
     static final double[] kSwerveModuleAngularOffsets = {
       0, -Math.PI / 2, Math.PI / 2, Math.PI
     };
 
     public static double kSwerveModuleAngularOffset(int backNotFront, int LeftNotRight) {
-      assert backNotFront == 0 || backNotFront == 1;
-      assert LeftNotRight == 0 || LeftNotRight == 1;
-
       return kSwerveModuleAngularOffsets
-        [ backNotFront << 1
-        | LeftNotRight << 0 ];
+        [ModuleId.toIndex(backNotFront, LeftNotRight)];
     }
 
     public static class CAN {
       public static int kMotorPort(int backNotFront, int LeftNotRight, int driveNotTurn) {
-        assert backNotFront == 0 || backNotFront == 1;
-        assert LeftNotRight == 0 || LeftNotRight == 1;
-        assert driveNotTurn == 0 || driveNotTurn == 1;
-
         return 20 +
-          ( backNotFront << 2
-          | LeftNotRight << 1
-          | driveNotTurn << 0 );
+          ModuleId.toIndex(backNotFront, LeftNotRight, driveNotTurn);
       }
     }
 
@@ -48,6 +58,23 @@ public final class Constants {
       public static final int Lf = 1; // left
       public static final int Dv = 0; // drive
       public static final int Tn = 1; // turn
+
+      public static int toIndex(int backNotFront, int LeftNotRight) {
+        assert backNotFront == 0 || backNotFront == 1;
+        assert LeftNotRight == 0 || LeftNotRight == 1;
+
+        return
+          ( backNotFront << 1
+          | LeftNotRight << 0 );
+      }
+
+      public static int toIndex(int backNotFront, int LeftNotRight, int driveNotTurn) {
+        assert driveNotTurn == 0 || driveNotTurn == 1;
+
+        return
+          ( toIndex(backNotFront, LeftNotRight) << 1
+          | driveNotTurn << 0 );
+      }
     }
   }
 
