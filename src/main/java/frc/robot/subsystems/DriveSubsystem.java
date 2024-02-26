@@ -4,8 +4,6 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis.kZ;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,7 +19,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
+import static edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis.kZ;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
@@ -93,6 +93,11 @@ public class DriveSubsystem extends SubsystemBase {
   private void populateDashboard() {
     m_dashboard.addBoolean("IsXFormation",
       () -> m_isXFormation);
+
+    m_dashboard.add("IsFieldRelative", m_isFieldRelative)
+      .withWidget(BuiltInWidgets.kToggleButton)
+      .getEntry()
+      .andThen(x -> m_isFieldRelative = x.getBoolean());
 
     m_dashboard.addStringArray("Pose",
       FormatUtil.formatted(this::getPose, pose -> List.of(
