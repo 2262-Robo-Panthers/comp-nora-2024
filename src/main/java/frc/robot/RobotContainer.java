@@ -4,9 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.revrobotics.CANSparkMax;
@@ -26,11 +28,14 @@ import frc.robot.Constants.*;
 import static frc.robot.Constants.DriveConstants.ModuleId.*;
 
 public class RobotContainer {
+  private final ShuffleboardTab m_dashboard = Shuffleboard.getTab("2024");
+
   private final CommandXboxController m_driverController = new CommandXboxController(
     OIConstants.USB.kDriverControllerPort
   );
 
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem(
+    m_dashboard,
     DriveConstants.kMaxSpeedLin_m_s,
     DriveConstants.kMaxSpeedAng_rad_s,
     DriveConstants.kIsGyroReversed,
@@ -61,6 +66,7 @@ public class RobotContainer {
   );
 
   private final Command m_driveCommand = new DriveCommand(
+    m_dashboard,
     m_driveSubsystem,
     m_driverController::getLeftY,
     m_driverController::getLeftX,
@@ -134,7 +140,9 @@ public class RobotContainer {
 
   private void configureBindings() {
     m_driverController.x()
-      .whileTrue(new RunCommand(m_driveSubsystem::doXFormation, m_driveSubsystem));
+      .onTrue(new InstantCommand(() -> m_driveSubsystem.setXFormation(true), m_driveSubsystem));
+    m_driverController.a()
+      .onTrue(new InstantCommand(() -> m_driveSubsystem.setXFormation(false), m_driveSubsystem));
 
     m_endEffectorController.start()
       .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));

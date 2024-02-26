@@ -4,8 +4,12 @@
 
 package frc.robot.subsystems;
 
-import java.util.Arrays;
+import static edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis.kZ;
 
+import java.util.Arrays;
+import java.util.List;
+
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,43 +21,55 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
-import static edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis.*;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.MAXSwerve.SwerveUtils;
-import frc.robot.Constants.DriveConstants.ModuleId;
-import static frc.robot.Constants.DriveConstants.ModuleId.*;
+import frc.robot.util.FormatUtil;
 
 public class DriveSubsystem extends SubsystemBase {
-  private final MAXSwerveModule[] m_modules;
+  private final ShuffleboardTab m_dashboard;
+
+  private final double m_maxSpeedLin;
+  private final double m_maxSpeedAng;
+  private final boolean m_isGyroReversed;
+
+  private final SlewRateLimiter m_limiterMovement;
+  private final SlewRateLimiter m_limiterRotation;
+  private final double m_slewRateDirection;
 
   private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
   private final SwerveDriveOdometry m_odometry;
   private final SwerveDriveKinematics m_driveKinematics;
 
-  private final SlewRateLimiter m_limiterMovement;
-  private final SlewRateLimiter m_limiterRotation;
-  private final double m_slewRateDirection;
+  private final MAXSwerveModule[] m_modules;
+
+  private boolean m_isFieldRelative = false;
+  private boolean m_isXFormation = false;
 
   private double m_currentMovementMag = 0.0;
   private double m_currentMovementDir = 0.0;
 
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
-  private boolean m_isFieldRelative = false;
-
-  private final double m_maxSpeedLin;
-  private final double m_maxSpeedAng;
-  private final boolean m_isGyroReversed;
+  private static final SwerveModuleState[] kXFormationStates = {
+    new SwerveModuleState(0.0, Rotation2d.fromDegrees(-45.0)),
+    new SwerveModuleState(0.0, Rotation2d.fromDegrees(+45.0)),
+    new SwerveModuleState(0.0, Rotation2d.fromDegrees(+45.0)),
+    new SwerveModuleState(0.0, Rotation2d.fromDegrees(-45.0))
+  };
 
   public DriveSubsystem(
+    ShuffleboardTab shuffleboardTab,
     double maxSpeedLin_m_s, double maxSpeedAng_rad_s, boolean isGyroReversed,
     double slewRateMovement, double slewRateDirection, double slewRateRotation,
     SwerveDriveKinematics driveKinematics,
     MAXSwerveModule... modules
   ) {
+    m_dashboard = shuffleboardTab;
+
     m_maxSpeedLin = maxSpeedLin_m_s;
     m_maxSpeedAng = maxSpeedAng_rad_s;
     m_isGyroReversed = isGyroReversed;
@@ -65,11 +81,31 @@ public class DriveSubsystem extends SubsystemBase {
     m_modules = modules;
     m_odometry = new SwerveDriveOdometry(driveKinematics, getRotation(), getModulePositions());
     m_driveKinematics = driveKinematics;
+
+    populateDashboard();
   }
 
   @Override
   public void periodic() {
     m_odometry.update(getRotation(), getModulePositions());
+  }
+
+  private void populateDashboard() {
+    m_dashboard.addBoolean("IsXFormation",
+      () -> m_isXFormation);
+
+    m_dashboard.addStringArray("Pose",
+      FormatUtil.formatted(this::getPose, pose -> List.of(
+        new Pair<>("x", pose.getX()),
+        new Pair<>("y", pose.getY()),
+        new Pair<>("θ", pose.getRotation().getDegrees())
+      )));
+
+    m_dashboard.addStringArray("Gyro",
+      FormatUtil.formatted(List.of(
+        new Pair<>("θ", this::getRotation_deg),
+        new Pair<>("ω", this::getRotationRate_deg_s)
+      )));
   }
 
   public Pose2d getPose() {
@@ -84,7 +120,7 @@ public class DriveSubsystem extends SubsystemBase {
     return getRotation().getDegrees();
   }
 
-  public double getRotatationRate_deg_s() {
+  public double getRotationRate_deg_s() {
     return m_gyro.getRate(kZ) *  (m_isGyroReversed ? -1.0 : 1.0);
   }
 
@@ -96,13 +132,6 @@ public class DriveSubsystem extends SubsystemBase {
     return Arrays.stream(m_modules)
       .map(MAXSwerveModule::getPosition)
       .toArray(n -> new SwerveModulePosition[n]);
-  }
-
-  public void doXFormation() {
-    m_modules[ModuleId.toIndex(Fr, Lf)].setDesiredState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(+45.0)));
-    m_modules[ModuleId.toIndex(Fr, Rt)].setDesiredState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(-45.0)));
-    m_modules[ModuleId.toIndex(Bk, Lf)].setDesiredState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(-45.0)));
-    m_modules[ModuleId.toIndex(Bk, Rt)].setDesiredState(new SwerveModuleState(0.0, Rotation2d.fromDegrees(+45.0)));
   }
 
   public void resetEncoders() {
@@ -125,6 +154,10 @@ public class DriveSubsystem extends SubsystemBase {
     m_isFieldRelative = isFieldRelative;
   }
 
+  public void setXFormation(boolean isXFormation) {
+    m_isXFormation = isXFormation;
+  }
+
   /**
    * Drive the robot using joystick inputs.
    *
@@ -133,20 +166,25 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rotInput Turn rate of the robot.
    */
   public void drive(double xInput, double yInput, double rotInput) {
-    // Pose2d processedInput = new Pose2d(xInput, yInput, new Rotation2d(rotInput));
-    Pose2d processedInput = applyRateLimiting(xInput, yInput, rotInput);
+    if (m_isXFormation) {
+      setModuleStates(kXFormationStates);
+    }
+    else {
+      // Pose2d processedInput = new Pose2d(xInput, yInput, new Rotation2d(rotInput));
+      Pose2d processedInput = applyRateLimiting(xInput, yInput, rotInput);
 
-    double xSpeed = processedInput.getX() * m_maxSpeedLin;
-    double ySpeed = processedInput.getY() * m_maxSpeedLin;
-    double rotSpeed = processedInput.getRotation().getRadians() * m_maxSpeedAng; // fake radians, see #applyRateLimiting
+      double xSpeed = processedInput.getX() * m_maxSpeedLin;
+      double ySpeed = processedInput.getY() * m_maxSpeedLin;
+      double rotSpeed = processedInput.getRotation().getRadians() * m_maxSpeedAng; // fake radians, see #applyRateLimiting
 
-    SwerveModuleState[] states = m_driveKinematics.toSwerveModuleStates(
-      m_isFieldRelative
-        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getRotation())
-        : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)
-    );
-
-    setModuleStates(states);
+      setModuleStates(
+        m_driveKinematics.toSwerveModuleStates(
+          m_isFieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getRotation())
+            : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)
+        )
+      );
+    }
   }
 
   private Pose2d applyRateLimiting(double xInput, double yInput, double rotInput) {
