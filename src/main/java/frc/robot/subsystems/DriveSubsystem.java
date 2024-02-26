@@ -175,7 +175,6 @@ public class DriveSubsystem extends SubsystemBase {
       setModuleStates(kXFormationStates);
     }
     else {
-      // Pose2d processedInput = new Pose2d(xInput, yInput, new Rotation2d(rotInput));
       Pose2d processedInput = applyRateLimiting(xInput, yInput, rotInput);
 
       double xSpeed = processedInput.getX() * m_maxSpeedLin;

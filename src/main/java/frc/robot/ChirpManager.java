@@ -25,6 +25,7 @@ public class ChirpManager {
   private final String[] m_songs;
   private int m_currentSong = 0;
 
+  @SuppressWarnings("unchecked")
   public ChirpManager(ArmSubsystem arm, Orchestra orchestra, String... songs) {
     m_arm = arm;
     m_orchestra = orchestra;
