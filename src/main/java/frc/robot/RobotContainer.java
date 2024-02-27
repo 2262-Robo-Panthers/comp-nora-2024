@@ -112,16 +112,20 @@ public class RobotContainer {
   private final Orchestra m_orchestra = new Orchestra();
 
   private final ChirpManager m_sfxManager = new ChirpManager(
+    m_dashboard,
     m_armSubsystem,
     m_orchestra,
+    "SFX",
     "game-sounds/start-auto",
     "game-sounds/start-teleop",
     "game-sounds/match-end"
   );
 
   private final ChirpManager m_chirpManager = new ChirpManager(
+    m_dashboard,
     m_armSubsystem,
     m_orchestra,
+    "Music",
     "music/happy-birthday",
     "music/mary-had-a-little-lamb",
     "music/twinkle-twinkle",
