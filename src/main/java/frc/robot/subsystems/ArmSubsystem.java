@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.SmartMotorController.SmartMotorController;
 
 public class ArmSubsystem extends SubsystemBase {
-  SmartMotorController m_pivot;
-  SmartMotorController m_intake;
-  SmartMotorController m_launch;
+  private final SmartMotorController m_pivot;
+  private final SmartMotorController m_intake;
+  private final SmartMotorController m_launch;
 
   public ArmSubsystem(SmartMotorController pivot, SmartMotorController intake, SmartMotorController launch) {
     m_pivot = pivot;

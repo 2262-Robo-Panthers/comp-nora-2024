@@ -41,6 +41,13 @@ public class DriveCommand extends Command {
     m_strafeY = FunctionalUtil.supplyThenOperate(strafeY, deadbandify);
     m_rotation = FunctionalUtil.supplyThenOperate(rotation, deadbandify);
 
+    m_dashboard.addStringArray("OI",
+      FormatUtil.formatted(List.of(
+        new Pair<>("vx", m_strafeX),
+        new Pair<>("vy", m_strafeY),
+        new Pair<>("vw", m_rotation)
+      ), ".3"));
+
     addRequirements(drive);
   }
 
@@ -51,13 +58,6 @@ public class DriveCommand extends Command {
     double rotation = m_rotation.get();
 
     m_drive.drive(strafeX, strafeY, rotation);
-
-    m_dashboard.addStringArray("OI",
-      FormatUtil.formatted(List.of(
-        new Pair<>("v", m_strafeX),
-        new Pair<>("w", m_strafeY),
-        new Pair<>("ω", m_rotation)
-      )));
   }
 
   @Override

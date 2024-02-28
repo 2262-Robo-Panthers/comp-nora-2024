@@ -17,13 +17,13 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import static edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis.kZ;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.MAXSwerve.SwerveUtils;
 import frc.robot.util.FormatUtil;
@@ -46,7 +46,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final MAXSwerveModule[] m_modules;
 
-  private boolean m_isFieldRelative = false;
+  private GenericEntry m_isFieldRelative;
   private boolean m_isXFormation = false;
 
   private double m_currentMovementMag = 0.0;
@@ -94,23 +94,23 @@ public class DriveSubsystem extends SubsystemBase {
     m_dashboard.addBoolean("IsXFormation",
       () -> m_isXFormation);
 
+    m_isFieldRelative =
     m_dashboard.add("IsFieldRelative", m_isFieldRelative)
       .withWidget(BuiltInWidgets.kToggleButton)
-      .getEntry()
-      .andThen(x -> m_isFieldRelative = x.getBoolean());
+      .getEntry();
 
     m_dashboard.addStringArray("Pose",
       FormatUtil.formatted(this::getPose, pose -> List.of(
         new Pair<>("x", pose.getX()),
         new Pair<>("y", pose.getY()),
-        new Pair<>("θ", pose.getRotation().getDegrees())
-      )));
+        new Pair<>("t", pose.getRotation().getDegrees())
+      ), ".3"));
 
     m_dashboard.addStringArray("Gyro",
       FormatUtil.formatted(List.of(
-        new Pair<>("θ", this::getRotation_deg),
-        new Pair<>("ω", this::getRotationRate_deg_s)
-      )));
+        new Pair<>("t", this::getRotation_deg),
+        new Pair<>("w", this::getRotationRate_deg_s)
+      ), ".3"));
   }
 
   public Pose2d getPose() {
@@ -156,7 +156,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setReferencePlane(boolean isFieldRelative) {
-    m_isFieldRelative = isFieldRelative;
+    m_isFieldRelative.setBoolean(isFieldRelative);
   }
 
   public void setXFormation(boolean isXFormation) {
@@ -183,7 +183,7 @@ public class DriveSubsystem extends SubsystemBase {
 
       setModuleStates(
         m_driveKinematics.toSwerveModuleStates(
-          m_isFieldRelative
+          m_isFieldRelative.getBoolean(false)
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed, getRotation())
             : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed)
         )

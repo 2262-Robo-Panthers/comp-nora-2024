@@ -45,19 +45,19 @@ public class ChirpManager {
       m_orchestra.addInstrument((TalonFX) controller);
     }
 
-    m_dashboard.add("IsChirpable", false)
-      .withWidget(BuiltInWidgets.kToggleSwitch)
-      .getEntry()
-      .andThen(x -> {
-        if (!x.getBoolean() && m_orchestra.isPlaying()) {
-          m_wasInterrupted = true;
-          m_orchestra.stop();
-        }
-        else if (x.getBoolean() && m_wasInterrupted) {
-          m_wasInterrupted = false;
-          m_orchestra.play();
-        }
-      });
+    // m_dashboard.add("IsChirpable", false)
+    //   .withWidget(BuiltInWidgets.kToggleSwitch)
+    //   .getEntry()
+    //   .andThen(x -> {
+    //     if (!x.getBoolean() && m_orchestra.isPlaying()) {
+    //       m_wasInterrupted = true;
+    //       m_orchestra.stop();
+    //     }
+    //     else if (x.getBoolean() && m_wasInterrupted) {
+    //       m_wasInterrupted = false;
+    //       m_orchestra.play();
+    //     }
+    //   });
 
     m_dashboard.addStringArray("Chirp." + name,
       FormatUtil.formatted(List.of(
