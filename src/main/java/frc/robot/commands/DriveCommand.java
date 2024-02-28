@@ -4,22 +4,19 @@
 
 package frc.robot.commands;
 
-import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.util.FormatUtil;
 import frc.robot.util.FunctionalUtil;
+import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class DriveCommand extends Command {
-  private final ShuffleboardTab m_dashboard;
-
   private final DriveSubsystem m_drive;
 
   private final Supplier<Double> m_strafeX;
@@ -32,8 +29,6 @@ public class DriveCommand extends Command {
     Supplier<Double> strafeX, Supplier<Double> strafeY, Supplier<Double> rotation,
     double deadband
   ) {
-    m_dashboard = shuffleboardTab;
-
     m_drive = drive;
 
     UnaryOperator<Double> deadbandify = i -> 0 - MathUtil.applyDeadband(i, deadband);
@@ -41,14 +36,17 @@ public class DriveCommand extends Command {
     m_strafeY = FunctionalUtil.supplyThenOperate(strafeY, deadbandify);
     m_rotation = FunctionalUtil.supplyThenOperate(rotation, deadbandify);
 
-    m_dashboard.addStringArray("OI",
-      FormatUtil.formatted(List.of(
-        new Pair<>("vx", m_strafeX),
-        new Pair<>("vy", m_strafeY),
-        new Pair<>("vw", m_rotation)
-      ), ".3"));
+    populateDashboard(shuffleboardTab);
 
     addRequirements(drive);
+  }
+
+  private void populateDashboard(ShuffleboardTab dashboard) {
+    ShuffleboardTabWithMaps.addMap(dashboard, "Controls", "%.3f", Map.of(
+      "Strafe X", m_strafeX,
+      "Strafe Y", m_strafeY,
+      "Rotation", m_rotation
+    ));
   }
 
   @Override

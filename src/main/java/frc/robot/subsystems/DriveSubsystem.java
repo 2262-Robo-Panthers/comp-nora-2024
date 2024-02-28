@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -26,11 +26,9 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.MAXSwerve.SwerveUtils;
-import frc.robot.util.FormatUtil;
+import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class DriveSubsystem extends SubsystemBase {
-  private final ShuffleboardTab m_dashboard;
-
   private final double m_maxSpeedLin;
   private final double m_maxSpeedAng;
   private final boolean m_isGyroReversed;
@@ -68,8 +66,6 @@ public class DriveSubsystem extends SubsystemBase {
     SwerveDriveKinematics driveKinematics,
     MAXSwerveModule... modules
   ) {
-    m_dashboard = shuffleboardTab;
-
     m_maxSpeedLin = maxSpeedLin_m_s;
     m_maxSpeedAng = maxSpeedAng_rad_s;
     m_isGyroReversed = isGyroReversed;
@@ -82,7 +78,7 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry = new SwerveDriveOdometry(driveKinematics, getRotation(), getModulePositions());
     m_driveKinematics = driveKinematics;
 
-    populateDashboard();
+    populateDashboard(shuffleboardTab);
   }
 
   @Override
@@ -90,27 +86,24 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry.update(getRotation(), getModulePositions());
   }
 
-  private void populateDashboard() {
-    m_dashboard.addBoolean("IsXFormation",
-      () -> m_isXFormation);
+  private void populateDashboard(ShuffleboardTab dashboard) {
+    dashboard.addBoolean("IsXFormation", () -> m_isXFormation);
 
     m_isFieldRelative =
-    m_dashboard.add("IsFieldRelative", m_isFieldRelative)
+    dashboard.add("IsFieldRelative", m_isFieldRelative)
       .withWidget(BuiltInWidgets.kToggleButton)
       .getEntry();
 
-    m_dashboard.addStringArray("Pose",
-      FormatUtil.formatted(this::getPose, pose -> List.of(
-        new Pair<>("x", pose.getX()),
-        new Pair<>("y", pose.getY()),
-        new Pair<>("t", pose.getRotation().getDegrees())
-      ), ".3"));
+    ShuffleboardTabWithMaps.addMap(dashboard, "Pose", this::getPose, Map.of(
+      "X Position", new Pair<>("%.3f m", pose -> pose.getX()),
+      "Y Position", new Pair<>("%.3f m", pose -> pose.getY()),
+      "Orientation", new Pair<>("%.3f\u00b0", pose -> pose.getRotation().getDegrees())
+    ));
 
-    m_dashboard.addStringArray("Gyro",
-      FormatUtil.formatted(List.of(
-        new Pair<>("t", this::getRotation_deg),
-        new Pair<>("w", this::getRotationRate_deg_s)
-      ), ".3"));
+    ShuffleboardTabWithMaps.addMap(dashboard, "Gyro", Map.of(
+      "Angular Position", new Pair<>("%.3f\u00b0", this::getRotation_deg),
+      "Angular Velocity", new Pair<>("%.3f\u00b0/sec", this::getRotationRate_deg_s)
+    ));
   }
 
   public Pose2d getPose() {

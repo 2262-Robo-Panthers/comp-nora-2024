@@ -4,31 +4,32 @@
 
 package frc.robot;
 
-import java.util.List;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import edu.wpi.first.math.Pair;
+import edu.wpi.first.networktables.Topic;
+import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.button.NetworkButton;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
-import frc.robot.util.FormatUtil;
+import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class ChirpManager {
-  private final ShuffleboardTab m_dashboard;
-
   private final ArmSubsystem m_arm;
 
   private final Orchestra m_orchestra;
 
+  private final String m_name;
   private final String[] m_songs;
   private int m_currentSong = 0;
 
@@ -36,36 +37,45 @@ public class ChirpManager {
 
   @SuppressWarnings("unchecked")
   public ChirpManager(ShuffleboardTab shuffleboardTab, ArmSubsystem arm, Orchestra orchestra, String name, String... songs) {
-    m_dashboard = shuffleboardTab;
     m_arm = arm;
     m_orchestra = orchestra;
+    m_name = name;
     m_songs = songs;
 
     for (MotorController controller : ((SmartMotorControllerGroup<TalonFX>) m_arm.getPivot()).getControllers()) {
       m_orchestra.addInstrument((TalonFX) controller);
     }
 
-    // m_dashboard.add("IsChirpable", false)
-    //   .withWidget(BuiltInWidgets.kToggleSwitch)
-    //   .getEntry()
-    //   .andThen(x -> {
-    //     if (!x.getBoolean() && m_orchestra.isPlaying()) {
-    //       m_wasInterrupted = true;
-    //       m_orchestra.stop();
-    //     }
-    //     else if (x.getBoolean() && m_wasInterrupted) {
-    //       m_wasInterrupted = false;
-    //       m_orchestra.play();
-    //     }
-    //   });
-
-    m_dashboard.addStringArray("Chirp." + name,
-      FormatUtil.formatted(List.of(
-        new Pair<>("state", () -> m_orchestra.isPlaying() ? "playing" : "paused"),
-        new Pair<>("song", () -> m_songs[m_currentSong])
-      )));
-
     loadCurrentSong();
+
+    populateDashboard(shuffleboardTab);
+  }
+
+  private void populateDashboard(ShuffleboardTab dashboard) {
+    Topic isEnabled =
+    ShuffleboardTabWithMaps.addMap(dashboard, "ChirpManager." + m_name, "%s", Map.of(
+      "State", () -> m_orchestra.isPlaying() ? "playing" : "paused",
+      "CurrentSong", () -> m_songs[m_currentSong]
+    )).add(
+      "IsEnabled", false
+    )
+      .withWidget(BuiltInWidgets.kToggleSwitch)
+      .getEntry()
+      .getTopic();
+
+    new NetworkButton(new BooleanTopic(isEnabled))
+      .onFalse(new InstantCommand(() -> {
+        if (m_orchestra.isPlaying()) {
+          m_wasInterrupted = true;
+          m_orchestra.stop();
+        }
+      }, m_arm))
+      .onTrue(new InstantCommand(() -> {
+        if (m_wasInterrupted) {
+          m_orchestra.play();
+          m_wasInterrupted = false;
+        }
+      }, m_arm));
   }
 
   private void loadCurrentSong() {

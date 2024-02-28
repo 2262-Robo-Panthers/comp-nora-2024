@@ -4,11 +4,16 @@
 
 package frc.robot.util;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public class FunctionalUtil {
   public static <T> Supplier<T> supplyThenOperate(Supplier<T> supplier, UnaryOperator<T> operator) {
     return () -> operator.apply(supplier.get());
+  }
+
+  public static <T, U> Supplier<U> supplyThenProcess(Supplier<T> supplier, Function<T, U> processor) {
+    return () -> processor.apply(supplier.get());
   }
 }
