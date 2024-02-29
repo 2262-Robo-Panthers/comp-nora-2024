@@ -4,11 +4,14 @@
 
 package frc.robot.commands;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class ArmCommand extends Command {
   private final ArmSubsystem m_arm;
@@ -17,13 +20,27 @@ public class ArmCommand extends Command {
   private final Supplier<Double> m_intake;
   private final Supplier<Double> m_launch;
 
-  public ArmCommand(ArmSubsystem arm, Supplier<Double> pivot, Supplier<Double> intake, Supplier<Double> launch) {
+  public ArmCommand(
+    ShuffleboardTab shuffleboardTab,
+    ArmSubsystem arm,
+    Supplier<Double> pivot, Supplier<Double> intake, Supplier<Double> launch
+  ) {
     m_arm = arm;
     m_pivot = pivot;
     m_intake = intake;
     m_launch = launch;
 
+    populateDashboard(shuffleboardTab);
+
     addRequirements(arm);
+  }
+
+  private void populateDashboard(ShuffleboardTab dashboard) {
+    ShuffleboardTabWithMaps.addMap(dashboard, "EEor Controls", "%.3f", Map.of(
+      "Pivot Delta", m_pivot,
+      "Intake", m_intake,
+      "Launch", m_launch
+    ));
   }
 
   @Override
@@ -33,7 +50,7 @@ public class ArmCommand extends Command {
 
   @Override
   public void execute() {
-    m_arm.setPivotSpeed_TEMP(m_pivot.get());
+    m_arm.movePivotPosition(m_pivot.get());
     m_arm.setIntakeSpeed(m_intake.get());
     m_arm.setLaunchSpeed(m_launch.get());
   }

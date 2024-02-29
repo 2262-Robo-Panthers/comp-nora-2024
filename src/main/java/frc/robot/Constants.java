@@ -81,12 +81,22 @@ public final class Constants {
   }
 
   public static class PivotConstants {
-    public static final boolean kIsInverted = false;
+    public static final boolean kIsInverted = true;
     public static final double kMaxSpeed = 0.2;
+    public static final double kDistance = 12.0;
+
+    public static final double kP = 0.2;
+    public static final double kI = 0.1;
+    public static final double kD = 0.0;
 
     public static class CAN {
       public static final int kMotorPortA = 1;
       public static final int kMotorPortB = 2;
+    }
+
+    public static class DIO {
+      public static final int kLimitSwitchLower = 9;
+      public static final int kLimitSwitchUpper = 8;
     }
   }
 

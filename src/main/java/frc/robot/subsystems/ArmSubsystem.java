@@ -4,23 +4,104 @@
 
 package frc.robot.subsystems;
 
+import java.util.Map;
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.lib.SmartMotorController.SmartMotorController;
+import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
+import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class ArmSubsystem extends SubsystemBase {
   private final SmartMotorController m_pivot;
   private final SmartMotorController m_intake;
   private final SmartMotorController m_launch;
 
-  public ArmSubsystem(SmartMotorController pivot, SmartMotorController intake, SmartMotorController launch) {
+  private final double m_pivotDistance;
+  private final DigitalInput m_pivotLimitLower;
+  private final DigitalInput m_pivotLimitUpper;
+  private final PositionVoltage m_pivotRequest = new PositionVoltage(0).withSlot(0);
+  private double m_pivotPosition;
+  private TalonFX[] m_pivotControllers;
+  private TalonFX m_pivotMaster;
+
+  public ArmSubsystem(
+    ShuffleboardTab shuffleboardTab,
+    double pivotDistance,
+    double pivotKP, double pivotKI, double pivotKD,
+    DigitalInput pivotLimitLower, DigitalInput pivotLimitUpper,
+    SmartMotorController pivot,
+    SmartMotorController intake,
+    SmartMotorController launch
+  ) {
     m_pivot = pivot;
+    m_pivotDistance = pivotDistance;
+    m_pivotLimitLower = pivotLimitLower;
+    m_pivotLimitUpper = pivotLimitUpper;
     m_intake = intake;
     m_launch = launch;
+
+    setupPivotPid(pivotKP, pivotKI, pivotKD);
+    setupPivotLimits();
+
+    populateDashboard(shuffleboardTab);
   }
 
-  public void setPivotSpeed_TEMP(double velocity) {
-    m_pivot.forceTo(velocity);
+  @SuppressWarnings("unchecked")
+  private void setupPivotPid(double p, double i, double d) {
+    m_pivotControllers = (TalonFX[]) ((SmartMotorControllerGroup<TalonFX>) m_pivot).getControllers();
+    m_pivotMaster = m_pivotControllers[0];
+
+    Slot0Configs config = new Slot0Configs();
+    config.kP = p;
+    config.kI = i;
+    config.kD = d;
+
+    for (TalonFX controller : m_pivotControllers) {
+      controller.getConfigurator().apply(config);
+    }
+  }
+
+  private void setupPivotLimits() {
+    new Trigger(m_pivotLimitLower::get)
+      .onTrue(new InstantCommand(() -> {
+        resetPosition(0.0);
+        setPivotPosition(0.0);
+      }, this));
+
+    new Trigger(m_pivotLimitUpper::get)
+      .onTrue(new InstantCommand(() -> {
+        resetPosition(1.0);
+        setPivotPosition(1.0);
+      }, this));
+  }
+
+  private void populateDashboard(ShuffleboardTab dashboard) {
+    ShuffleboardTabWithMaps.addMap(dashboard, "Pivot", Map.of(
+      "Hit Lower", m_pivotLimitLower::get,
+      "Hit Upper", m_pivotLimitUpper::get
+    ), false).addDouble(
+      "Position", (DoubleSupplier) m_pivotMaster.getPosition().asSupplier()
+    );
+  }
+
+  public void movePivotPosition(double positionDelta) {
+    m_pivotPosition = MathUtil.clamp(m_pivotPosition + positionDelta, 0.0, 1.0);
+    setPivotPosition(m_pivotPosition);
+  }
+
+  public void setPivotPosition(double position) {
+    m_pivotMaster.setControl(m_pivotRequest.withPosition(position * m_pivotDistance));
   }
 
   public void setIntakeSpeed(double velocity) {
@@ -32,9 +113,14 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void stop() {
-    m_pivot.forceTo(0.0);
     m_intake.forceTo(0.0);
     m_launch.forceTo(0.0);
+  }
+
+  public void resetPosition(double position) {
+    for (TalonFX controller : m_pivotControllers) {
+      controller.setPosition(position * m_pivotDistance);
+    }
   }
 
   public SmartMotorController getPivot() {

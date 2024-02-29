@@ -42,7 +42,7 @@ public class DriveCommand extends Command {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, "Controls", "%.3f", Map.of(
+    ShuffleboardTabWithMaps.addMap(dashboard, "Drive Controls", "%.3f", Map.of(
       "Strafe X", m_strafeX,
       "Strafe Y", m_strafeY,
       "Rotation", m_rotation

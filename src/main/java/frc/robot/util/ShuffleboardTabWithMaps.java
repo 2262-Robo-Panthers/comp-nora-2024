@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -58,6 +59,16 @@ public class ShuffleboardTabWithMaps {
       list.addString(k, FunctionalUtil.supplyThenProcess(source, x -> String.format(v.getFirst(), v.getSecond().apply(x))));
     });
  
+    return list;
+  }
+
+  public static ShuffleboardLayout addMap(ShuffleboardTab tab, String name, Map<String, Supplier<Boolean>> data, boolean __) {
+    ShuffleboardLayout list = tab.getLayout(name, BuiltInLayouts.kList);
+
+    data.forEach((k, v) -> {
+      list.addBoolean(k, (BooleanSupplier) v);
+    });
+
     return list;
   }
 }

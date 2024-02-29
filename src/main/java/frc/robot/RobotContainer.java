@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -79,6 +81,13 @@ public class RobotContainer {
   );
 
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem(
+    m_dashboard,
+    PivotConstants.kDistance,
+    PivotConstants.kP,
+    PivotConstants.kI,
+    PivotConstants.kD,
+    new DigitalInput(PivotConstants.DIO.kLimitSwitchLower),
+    new DigitalInput(PivotConstants.DIO.kLimitSwitchUpper),
     new SmartMotorControllerGroup<>(
       PivotConstants.kIsInverted,
       PivotConstants.kMaxSpeed,
@@ -103,8 +112,11 @@ public class RobotContainer {
   );
 
   private final ArmCommand m_armCommand = new ArmCommand(
+    m_dashboard,
     m_armSubsystem,
-    () -> m_endEffectorController.getRightTriggerAxis() - m_endEffectorController.getLeftTriggerAxis(),
+    () ->
+      m_endEffectorController.getRightTriggerAxis() -
+      m_endEffectorController.getLeftTriggerAxis(),
     m_endEffectorController::getRightY,
     m_endEffectorController::getLeftY
   );
@@ -143,10 +155,17 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    m_driverController.x()
+    m_driverController.back()
       .onTrue(new InstantCommand(() -> m_driveSubsystem.setXFormation(true), m_driveSubsystem));
-    m_driverController.a()
+    m_driverController.start()
       .onTrue(new InstantCommand(() -> m_driveSubsystem.setXFormation(false), m_driveSubsystem));
+
+    m_driverController.x()
+      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseTranslationX(0.0), m_driveSubsystem));
+    m_driverController.y()
+      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseTranslationY(0.0), m_driveSubsystem));
+    m_driverController.a()
+      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(Math.PI / 2)), m_driveSubsystem));
 
     m_endEffectorController.start()
       .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));

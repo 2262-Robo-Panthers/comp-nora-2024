@@ -90,7 +90,7 @@ public class DriveSubsystem extends SubsystemBase {
     dashboard.addBoolean("IsXFormation", () -> m_isXFormation);
 
     m_isFieldRelative =
-    dashboard.add("IsFieldRelative", m_isFieldRelative)
+    dashboard.add("IsFieldRelative", false)
       .withWidget(BuiltInWidgets.kToggleButton)
       .getEntry();
 
@@ -102,7 +102,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     ShuffleboardTabWithMaps.addMap(dashboard, "Gyro", Map.of(
       "Angular Position", new Pair<>("%.3f\u00b0", this::getRotation_deg),
-      "Angular Velocity", new Pair<>("%.3f\u00b0/sec", this::getRotationRate_deg_s)
+      "Angular Velocity", new Pair<>("%.3f\u00b0/s", this::getRotationRate_deg_s)
     ));
   }
 
@@ -114,12 +114,29 @@ public class DriveSubsystem extends SubsystemBase {
     m_odometry.resetPosition(getRotation(), getModulePositions(), pose);
   }
 
+  public void usePoseTranslation(Translation2d translation) {
+    usePose(new Pose2d(translation, m_odometry.getPoseMeters().getRotation()));
+  }
+
+  public void usePoseTranslationX(double x) {
+    usePoseTranslation(new Translation2d(x, m_odometry.getPoseMeters().getY()));
+  }
+
+  public void usePoseTranslationY(double y) {
+    usePoseTranslation(new Translation2d(m_odometry.getPoseMeters().getX(), y));
+  }
+
+  public void usePoseRotation(Rotation2d rotation) {
+    usePose(new Pose2d(m_odometry.getPoseMeters().getTranslation(), rotation));
+    m_gyro.setGyroAngle(kZ, rotation.getRadians());
+  }
+
   public double getRotation_deg() {
     return getRotation().getDegrees();
   }
 
   public double getRotationRate_deg_s() {
-    return m_gyro.getRate(kZ) *  (m_isGyroReversed ? -1.0 : 1.0);
+    return m_gyro.getRate(kZ) * (m_isGyroReversed ? -1.0 : 1.0);
   }
 
   private Rotation2d getRotation() {
