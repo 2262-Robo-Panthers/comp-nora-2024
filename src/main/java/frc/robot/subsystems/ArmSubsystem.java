@@ -4,9 +4,9 @@
 
 package frc.robot.subsystems;
 
-import java.util.Map;
-import java.util.function.DoubleSupplier;
+import java.util.List;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -87,12 +87,15 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, "Pivot", Map.of(
-      "Hit Lower", m_pivotLimitLower::get,
-      "Hit Upper", m_pivotLimitUpper::get
-    ), false).addDouble(
-      "Position", (DoubleSupplier) m_pivotMaster.getPosition().asSupplier()
-    );
+    ShuffleboardTabWithMaps.addMap(dashboard, "Pivot", List.of(
+      new Pair<>("Hit Lower", m_pivotLimitLower::get),
+      new Pair<>("Hit Upper", m_pivotLimitUpper::get)
+    ), false)
+      .withPosition(4, 2)
+      .withSize(2, 2)
+      .addDouble(
+        "Position", m_pivotMaster.getPosition().asSupplier()::get
+      );
   }
 
   public void movePivotPosition(double positionDelta) {

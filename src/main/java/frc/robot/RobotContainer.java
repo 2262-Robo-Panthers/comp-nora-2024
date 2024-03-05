@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -20,6 +19,7 @@ import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.Follower;
 
+import frc.robot.commands.AutoCommand;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -165,7 +165,7 @@ public class RobotContainer {
     m_driverController.y()
       .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseTranslationY(0.0), m_driveSubsystem));
     m_driverController.a()
-      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(Math.PI / 2)), m_driveSubsystem));
+      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(0.0)), m_driveSubsystem));
 
     m_endEffectorController.start()
       .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));
@@ -183,6 +183,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return AutoCommand.basicMove(m_driveSubsystem);
   }
 }

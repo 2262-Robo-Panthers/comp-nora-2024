@@ -4,9 +4,10 @@
 
 package frc.robot.commands;
 
-import java.util.Map;
+import java.util.List;
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -36,11 +37,13 @@ public class ArmCommand extends Command {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, "EEor Controls", "%.3f", Map.of(
-      "Pivot Delta", m_pivot,
-      "Intake", m_intake,
-      "Launch", m_launch
-    ));
+    ShuffleboardTabWithMaps.addMap(dashboard, "EEor Controls", "%.3f", List.of(
+      new Pair<>("Pivot Delta", m_pivot),
+      new Pair<>("Intake", m_intake),
+      new Pair<>("Launch", m_launch)
+    ))
+      .withPosition(0, 2)
+      .withSize(2, 2);
   }
 
   @Override

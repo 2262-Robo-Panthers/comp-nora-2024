@@ -4,10 +4,11 @@
 
 package frc.robot.commands;
 
-import java.util.Map;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -42,11 +43,13 @@ public class DriveCommand extends Command {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, "Drive Controls", "%.3f", Map.of(
-      "Strafe X", m_strafeX,
-      "Strafe Y", m_strafeY,
-      "Rotation", m_rotation
-    ));
+    ShuffleboardTabWithMaps.addMap(dashboard, "Drive Controls", "%.3f", List.of(
+      new Pair<>("Strafe X", m_strafeX),
+      new Pair<>("Strafe Y", m_strafeY),
+      new Pair<>("Rotation", m_rotation)
+    ))
+      .withPosition(0, 0)
+      .withSize(2, 2);
   }
 
   @Override

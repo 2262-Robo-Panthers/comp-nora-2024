@@ -4,11 +4,10 @@
 
 package frc.robot.util;
 
+import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -16,59 +15,73 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 
 public class ShuffleboardTabWithMaps {
-  public static <T> ShuffleboardLayout addMap(ShuffleboardTab tab, String name, String fmt, Map<String, Supplier<T>> data) {
+  public static <T> ShuffleboardLayout addMap(
+    ShuffleboardTab tab, String name,
+    String fmt, List<Pair<String, Supplier<T>>> data
+  ) {
     return addMap(tab, name,
       data
-        .entrySet()
         .stream()
-        .collect(
-          () -> new HashMap<String, Pair<String, Supplier<T>>>(),
-          (m, e) -> m.put(e.getKey(), new Pair<>(fmt, e.getValue())),
-          Map::putAll
-        )
+        .map(x -> new Pair<>(x.getFirst(), new Pair<>(fmt, x.getSecond())))
+        .toList()
     );
   }
 
-  public static <T> ShuffleboardLayout addMap(ShuffleboardTab tab, String name, Map<String, Pair<String, Supplier<T>>> data) {
+  public static <T> ShuffleboardLayout addMap(
+    ShuffleboardTab tab, String name,
+    List<Pair<String, Pair<String, Supplier<T>>>> data
+  ) {
     ShuffleboardLayout list = tab.getLayout(name, BuiltInLayouts.kList);
 
-    data.forEach((k, v) -> {
-      list.addString(k, () -> String.format(v.getFirst(), v.getSecond().get()));
+    data.forEach(x -> {
+      list.addString(x.getFirst(),
+        () -> String.format(
+          x.getSecond().getFirst(),
+          x.getSecond().getSecond().get()
+        ));
     });
  
-    return list;
+    return list.withProperties(Map.of("Label position", "TOP"));
   }
 
-  public static <T, V> ShuffleboardLayout addMap(ShuffleboardTab tab, String name, Supplier<T> source, String fmt, Map<String, Function<T, V>> data) {
+  public static <T, V> ShuffleboardLayout addMap(
+    ShuffleboardTab tab, String name, Supplier<T> source,
+    String fmt, List<Pair<String, Function<T, V>>> data
+  ) {
     return addMap(tab, name, source,
       data
-        .entrySet()
         .stream()
-        .collect(
-          () -> new HashMap<String, Pair<String, Function<T, V>>>(),
-          (m, e) -> m.put(e.getKey(), new Pair<>(fmt, e.getValue())),
-          Map::putAll
-        )
+        .map(x -> new Pair<>(x.getFirst(), new Pair<>(fmt, x.getSecond())))
+        .toList()
     );
   }
 
-  public static <T, V> ShuffleboardLayout addMap(ShuffleboardTab tab, String name, Supplier<T> source, Map<String, Pair<String, Function<T, V>>> data) {
+  public static <T, V> ShuffleboardLayout addMap(
+    ShuffleboardTab tab, String name, Supplier<T> source,
+    List<Pair<String, Pair<String, Function<T, V>>>> data
+  ) {
     ShuffleboardLayout list = tab.getLayout(name, BuiltInLayouts.kList);
 
-    data.forEach((k, v) -> {
-      list.addString(k, FunctionalUtil.supplyThenProcess(source, x -> String.format(v.getFirst(), v.getSecond().apply(x))));
+    data.forEach(x -> {
+      list.addString(x.getFirst(),
+        FunctionalUtil.supplyThenProcess(source, y -> String.format(
+          x.getSecond().getFirst(),
+          x.getSecond().getSecond().apply(y)
+        )));
     });
  
-    return list;
+    return list.withProperties(Map.of("Label position", "TOP"));
   }
 
-  public static ShuffleboardLayout addMap(ShuffleboardTab tab, String name, Map<String, Supplier<Boolean>> data, boolean __) {
+  public static ShuffleboardLayout addMap(
+    ShuffleboardTab tab, String name,
+    List<Pair<String, Supplier<Boolean>>> data, boolean __) {
     ShuffleboardLayout list = tab.getLayout(name, BuiltInLayouts.kList);
 
-    data.forEach((k, v) -> {
-      list.addBoolean(k, (BooleanSupplier) v);
+    data.forEach(x -> {
+      list.addBoolean(x.getFirst(), x.getSecond()::get);
     });
 
-    return list;
+    return list.withProperties(Map.of("Label position", "TOP"));
   }
 }

@@ -4,9 +4,10 @@
 
 package frc.robot;
 
-import java.util.Map;
+import java.util.List;
 import java.util.function.UnaryOperator;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.networktables.Topic;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -53,12 +54,13 @@ public class ChirpManager {
 
   private void populateDashboard(ShuffleboardTab dashboard) {
     Topic isEnabled =
-    ShuffleboardTabWithMaps.addMap(dashboard, "ChirpManager." + m_name, "%s", Map.of(
-      "State", () -> m_orchestra.isPlaying() ? "playing" : "paused",
-      "CurrentSong", () -> m_songs[m_currentSong]
+    ShuffleboardTabWithMaps.addMap(dashboard, "ChirpManager." + m_name, "%s", List.of(
+      new Pair<>("State", () -> m_orchestra.isPlaying() ? "playing" : "paused"),
+      new Pair<>("CurrentSong", () -> m_songs[m_currentSong])
     )).add(
       "IsEnabled", false
     )
+      .withSize(2, 2)
       .withWidget(BuiltInWidgets.kToggleSwitch)
       .getEntry()
       .getTopic();

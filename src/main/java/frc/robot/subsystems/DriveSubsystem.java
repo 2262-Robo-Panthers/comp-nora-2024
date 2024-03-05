@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -87,23 +87,31 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    dashboard.addBoolean("IsXFormation", () -> m_isXFormation);
+    dashboard.addBoolean("IsXFormation", () -> m_isXFormation)
+      .withPosition(2, 3)
+      .withSize(2, 1);
 
     m_isFieldRelative =
     dashboard.add("IsFieldRelative", false)
+      .withPosition(2, 2)
+      .withSize(2, 1)
       .withWidget(BuiltInWidgets.kToggleButton)
       .getEntry();
 
-    ShuffleboardTabWithMaps.addMap(dashboard, "Pose", this::getPose, Map.of(
-      "X Position", new Pair<>("%.3f m", pose -> pose.getX()),
-      "Y Position", new Pair<>("%.3f m", pose -> pose.getY()),
-      "Orientation", new Pair<>("%.3f\u00b0", pose -> pose.getRotation().getDegrees())
-    ));
+    ShuffleboardTabWithMaps.addMap(dashboard, "Pose", this::getPose, List.of(
+      new Pair<>("X Position", new Pair<>("%.3f m", pose -> pose.getX())),
+      new Pair<>("Y Position", new Pair<>("%.3f m", pose -> pose.getY())),
+      new Pair<>("Orientation", new Pair<>("%.3f\u00b0", pose -> pose.getRotation().getDegrees()))
+    ))
+      .withPosition(2, 0)
+      .withSize(2, 2);
 
-    ShuffleboardTabWithMaps.addMap(dashboard, "Gyro", Map.of(
-      "Angular Position", new Pair<>("%.3f\u00b0", this::getRotation_deg),
-      "Angular Velocity", new Pair<>("%.3f\u00b0/s", this::getRotationRate_deg_s)
-    ));
+    ShuffleboardTabWithMaps.addMap(dashboard, "Gyro", List.of(
+      new Pair<>("Angular Position", new Pair<>("%.3f\u00b0", this::getRotation_deg)),
+      new Pair<>("Angular Velocity", new Pair<>("%.3f\u00b0/s", this::getRotationRate_deg_s))
+    ))
+      .withPosition(4, 0)
+      .withSize(2, 2);
   }
 
   public Pose2d getPose() {
