@@ -27,17 +27,20 @@ public class ArmSubsystem extends SubsystemBase {
   private final SmartMotorController m_intake;
   private final SmartMotorController m_launch;
 
-  private final double m_pivotDistance;
   private final DigitalInput m_pivotLimitLower;
   private final DigitalInput m_pivotLimitUpper;
   private final PositionVoltage m_pivotRequest = new PositionVoltage(0).withSlot(0);
+  private final double m_pivotDistance;
+  private final double m_pivotHyperextension;
   private double m_pivotPosition;
+  private double m_pivotZero;
   private TalonFX[] m_pivotControllers;
   private TalonFX m_pivotMaster;
 
   public ArmSubsystem(
     ShuffleboardTab shuffleboardTab,
     double pivotDistance,
+    double pivotHyperextension,
     double pivotKP, double pivotKI, double pivotKD,
     DigitalInput pivotLimitLower, DigitalInput pivotLimitUpper,
     SmartMotorController pivot,
@@ -46,6 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
   ) {
     m_pivot = pivot;
     m_pivotDistance = pivotDistance;
+    m_pivotHyperextension = pivotHyperextension;
     m_pivotLimitLower = pivotLimitLower;
     m_pivotLimitUpper = pivotLimitUpper;
     m_intake = intake;
@@ -70,17 +74,19 @@ public class ArmSubsystem extends SubsystemBase {
     for (TalonFX controller : m_pivotControllers) {
       controller.getConfigurator().apply(config);
     }
+
+    resetPosition(0.5);
   }
 
   private void setupPivotLimits() {
     new Trigger(m_pivotLimitLower::get)
-      .onTrue(new InstantCommand(() -> {
+      .onFalse(new InstantCommand(() -> {
         resetPosition(0.0);
         setPivotPosition(0.0);
       }, this));
 
     new Trigger(m_pivotLimitUpper::get)
-      .onTrue(new InstantCommand(() -> {
+      .onFalse(new InstantCommand(() -> {
         resetPosition(1.0);
         setPivotPosition(1.0);
       }, this));
@@ -92,19 +98,24 @@ public class ArmSubsystem extends SubsystemBase {
       new Pair<>("Hit Upper", m_pivotLimitUpper::get)
     ), false)
       .withPosition(4, 2)
-      .withSize(2, 2)
-      .addDouble(
-        "Position", m_pivotMaster.getPosition().asSupplier()::get
-      );
+      .withSize(2, 3)
+      .addDouble("Position Requested", () -> m_pivotPosition * m_pivotDistance)
+      .getParent()
+      .addDouble("Position Reported", m_pivotMaster.getPosition().asSupplier()::get)
+      .getParent()
+      .addDouble("Position when Zero", () -> m_pivotZero);
   }
 
   public void movePivotPosition(double positionDelta) {
-    m_pivotPosition = MathUtil.clamp(m_pivotPosition + positionDelta, 0.0, 1.0);
-    setPivotPosition(m_pivotPosition);
+    setPivotPosition(MathUtil.clamp(
+      m_pivotPosition + positionDelta * 0.01,
+      -m_pivotHyperextension, m_pivotHyperextension
+    ));
   }
 
   public void setPivotPosition(double position) {
-    m_pivotMaster.setControl(m_pivotRequest.withPosition(position * m_pivotDistance));
+    m_pivotPosition = position;
+    m_pivotMaster.setControl(m_pivotRequest.withPosition(m_pivotZero + position * m_pivotDistance));
   }
 
   public void setIntakeSpeed(double velocity) {
@@ -121,9 +132,7 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   public void resetPosition(double position) {
-    for (TalonFX controller : m_pivotControllers) {
-      controller.setPosition(position * m_pivotDistance);
-    }
+    m_pivotZero = m_pivotMaster.getPosition().getValue() - position * m_pivotDistance;
   }
 
   public SmartMotorController getPivot() {

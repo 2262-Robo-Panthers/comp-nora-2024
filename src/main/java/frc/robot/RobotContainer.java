@@ -83,6 +83,7 @@ public class RobotContainer {
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem(
     m_dashboard,
     PivotConstants.kDistance,
+    PivotConstants.kHyperextension,
     PivotConstants.kP,
     PivotConstants.kI,
     PivotConstants.kD,
@@ -127,7 +128,7 @@ public class RobotContainer {
     m_dashboard,
     m_armSubsystem,
     m_orchestra,
-    "SFX",
+    "SFX", 6, 0,
     "game-sounds/start-auto",
     "game-sounds/start-teleop",
     "game-sounds/match-end"
@@ -137,7 +138,7 @@ public class RobotContainer {
     m_dashboard,
     m_armSubsystem,
     m_orchestra,
-    "Music",
+    "Music", 6, 2,
     "music/happy-birthday",
     "music/mary-had-a-little-lamb",
     "music/twinkle-twinkle",

@@ -34,10 +34,11 @@ public class ChirpManager {
   private final String[] m_songs;
   private int m_currentSong = 0;
 
+  private boolean m_isEnabled = false;
   private boolean m_wasInterrupted = false;
 
   @SuppressWarnings("unchecked")
-  public ChirpManager(ShuffleboardTab shuffleboardTab, ArmSubsystem arm, Orchestra orchestra, String name, String... songs) {
+  public ChirpManager(ShuffleboardTab shuffleboardTab, ArmSubsystem arm, Orchestra orchestra, String name, int x, int y, String... songs) {
     m_arm = arm;
     m_orchestra = orchestra;
     m_name = name;
@@ -49,30 +50,32 @@ public class ChirpManager {
 
     loadCurrentSong();
 
-    populateDashboard(shuffleboardTab);
+    populateDashboard(shuffleboardTab, x, y);
   }
 
-  private void populateDashboard(ShuffleboardTab dashboard) {
+  private void populateDashboard(ShuffleboardTab dashboard, int x, int y) {
     Topic isEnabled =
     ShuffleboardTabWithMaps.addMap(dashboard, "ChirpManager." + m_name, "%s", List.of(
       new Pair<>("State", () -> m_orchestra.isPlaying() ? "playing" : "paused"),
       new Pair<>("CurrentSong", () -> m_songs[m_currentSong])
-    )).add(
-      "IsEnabled", false
-    )
+    ))
+      .withPosition(x, y)
       .withSize(2, 2)
+      .add("IsEnabled", m_isEnabled)
       .withWidget(BuiltInWidgets.kToggleSwitch)
       .getEntry()
       .getTopic();
 
     new NetworkButton(new BooleanTopic(isEnabled))
       .onFalse(new InstantCommand(() -> {
+        m_isEnabled = false;
         if (m_orchestra.isPlaying()) {
+          m_orchestra.pause();
           m_wasInterrupted = true;
-          m_orchestra.stop();
         }
       }, m_arm))
       .onTrue(new InstantCommand(() -> {
+        m_isEnabled = true;
         if (m_wasInterrupted) {
           m_orchestra.play();
           m_wasInterrupted = false;
@@ -118,7 +121,7 @@ public class ChirpManager {
       () -> {
         if (m_orchestra.isPlaying()) {
           m_orchestra.pause();
-        } else {
+        } else if (m_isEnabled) {
           m_orchestra.play();
         }
       },
