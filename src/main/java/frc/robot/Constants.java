@@ -82,9 +82,8 @@ public final class Constants {
 
   public static class PivotConstants {
     public static final boolean kIsInverted = true;
-    public static final double kMaxSpeed = 0.0; // unused
-    public static final double kDistance = 14.0;
-    public static final double kHyperextension = 1.0;
+    public static final double kRange = 14.0;
+    public static final double kHyperextension = 0.07; // 7% of total range
 
     public static final double kP = 0.5;
     public static final double kI = 0.3;

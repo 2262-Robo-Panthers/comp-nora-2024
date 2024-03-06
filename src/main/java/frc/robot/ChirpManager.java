@@ -21,12 +21,12 @@ import edu.wpi.first.wpilibj2.command.button.NetworkButton;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
 import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class ChirpManager {
-  private final ArmSubsystem m_arm;
+  private final ShoulderSubsystem m_shoulder;
 
   private final Orchestra m_orchestra;
 
@@ -38,13 +38,13 @@ public class ChirpManager {
   private boolean m_wasInterrupted = false;
 
   @SuppressWarnings("unchecked")
-  public ChirpManager(ShuffleboardTab shuffleboardTab, ArmSubsystem arm, Orchestra orchestra, String name, int x, int y, String... songs) {
-    m_arm = arm;
+  public ChirpManager(ShuffleboardTab shuffleboardTab, ShoulderSubsystem shoulder, Orchestra orchestra, String name, int x, int y, String... songs) {
+    m_shoulder = shoulder;
     m_orchestra = orchestra;
     m_name = name;
     m_songs = songs;
 
-    for (MotorController controller : ((SmartMotorControllerGroup<TalonFX>) m_arm.getPivot()).getControllers()) {
+    for (MotorController controller : ((SmartMotorControllerGroup<TalonFX>) m_shoulder.getPivot()).getControllers()) {
       m_orchestra.addInstrument((TalonFX) controller);
     }
 
@@ -73,14 +73,14 @@ public class ChirpManager {
           m_orchestra.pause();
           m_wasInterrupted = true;
         }
-      }, m_arm))
+      }, m_shoulder))
       .onTrue(new InstantCommand(() -> {
         m_isEnabled = true;
         if (m_wasInterrupted) {
           m_orchestra.play();
           m_wasInterrupted = false;
         }
-      }, m_arm));
+      }, m_shoulder));
   }
 
   private void loadCurrentSong() {
@@ -105,7 +105,7 @@ public class ChirpManager {
 
         loadCurrentSong();
       },
-      m_arm
+      m_shoulder
     );
   }
 
@@ -125,7 +125,7 @@ public class ChirpManager {
           m_orchestra.play();
         }
       },
-      m_arm
+      m_shoulder
     );
   }
 }

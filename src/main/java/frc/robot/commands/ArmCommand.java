@@ -12,10 +12,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class ArmCommand extends Command {
   private final ArmSubsystem m_arm;
+  private final ShoulderSubsystem m_shoulder;
 
   private final Supplier<Double> m_pivot;
   private final Supplier<Double> m_intake;
@@ -23,17 +25,19 @@ public class ArmCommand extends Command {
 
   public ArmCommand(
     ShuffleboardTab shuffleboardTab,
-    ArmSubsystem arm,
+    ArmSubsystem arm, ShoulderSubsystem shoulder,
     Supplier<Double> pivot, Supplier<Double> intake, Supplier<Double> launch
   ) {
     m_arm = arm;
+    m_shoulder = shoulder;
+
     m_pivot = pivot;
     m_intake = intake;
     m_launch = launch;
 
     populateDashboard(shuffleboardTab);
 
-    addRequirements(arm);
+    addRequirements(arm, shoulder);
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
@@ -53,7 +57,7 @@ public class ArmCommand extends Command {
 
   @Override
   public void execute() {
-    m_arm.movePivotPosition(m_pivot.get());
+    m_shoulder.movePivotPosition(m_pivot.get());
     m_arm.setIntakeSpeed(m_intake.get());
     m_arm.setLaunchSpeed(m_launch.get());
   }

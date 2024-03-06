@@ -23,6 +23,7 @@ import frc.robot.commands.AutoCommand;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
@@ -81,21 +82,6 @@ public class RobotContainer {
   );
 
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem(
-    m_dashboard,
-    PivotConstants.kDistance,
-    PivotConstants.kHyperextension,
-    PivotConstants.kP,
-    PivotConstants.kI,
-    PivotConstants.kD,
-    new DigitalInput(PivotConstants.DIO.kLimitSwitchLower),
-    new DigitalInput(PivotConstants.DIO.kLimitSwitchUpper),
-    new SmartMotorControllerGroup<>(
-      PivotConstants.kIsInverted,
-      PivotConstants.kMaxSpeed,
-      (master, follower) -> follower.setControl(new Follower(master.getDeviceID(), false)),
-      new TalonFX(PivotConstants.CAN.kMotorPortA),
-      new TalonFX(PivotConstants.CAN.kMotorPortB)
-    ),
     new SmartMotorControllerGroup<>(
       IntakeConstants.kIsInverted,
       IntakeConstants.kMaxSpeed,
@@ -112,9 +98,27 @@ public class RobotContainer {
     )
   );
 
+  private final ShoulderSubsystem m_shoulderSubsystem = new ShoulderSubsystem(
+    m_dashboard,
+    PivotConstants.kRange,
+    PivotConstants.kHyperextension,
+    PivotConstants.kP,
+    PivotConstants.kI,
+    PivotConstants.kD,
+    new DigitalInput(PivotConstants.DIO.kLimitSwitchLower),
+    new DigitalInput(PivotConstants.DIO.kLimitSwitchUpper),
+    new SmartMotorControllerGroup<>(
+      PivotConstants.kIsInverted,
+      0.0, // multiplier is unused; SMCG only used as container
+      (master, follower) -> follower.setControl(new Follower(master.getDeviceID(), false)),
+      new TalonFX(PivotConstants.CAN.kMotorPortA),
+      new TalonFX(PivotConstants.CAN.kMotorPortB)
+    )
+  );
+
   private final ArmCommand m_armCommand = new ArmCommand(
     m_dashboard,
-    m_armSubsystem,
+    m_armSubsystem, m_shoulderSubsystem,
     () ->
       m_endEffectorController.getRightTriggerAxis() -
       m_endEffectorController.getLeftTriggerAxis(),
@@ -126,7 +130,7 @@ public class RobotContainer {
 
   private final ChirpManager m_sfxManager = new ChirpManager(
     m_dashboard,
-    m_armSubsystem,
+    m_shoulderSubsystem,
     m_orchestra,
     "SFX", 6, 0,
     "game-sounds/start-auto",
@@ -136,7 +140,7 @@ public class RobotContainer {
 
   private final ChirpManager m_chirpManager = new ChirpManager(
     m_dashboard,
-    m_armSubsystem,
+    m_shoulderSubsystem,
     m_orchestra,
     "Music", 6, 2,
     "music/happy-birthday",
