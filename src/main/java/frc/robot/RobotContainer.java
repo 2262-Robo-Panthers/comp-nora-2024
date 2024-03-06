@@ -17,7 +17,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.controls.Follower;
 
 import frc.robot.commands.AutoCommand;
 import frc.robot.commands.ArmCommand;
@@ -100,6 +99,7 @@ public class RobotContainer {
 
   private final ShoulderSubsystem m_shoulderSubsystem = new ShoulderSubsystem(
     m_dashboard,
+    PivotConstants.kIsInverted,
     PivotConstants.kRange,
     PivotConstants.kHyperextension,
     PivotConstants.kP,
@@ -107,13 +107,8 @@ public class RobotContainer {
     PivotConstants.kD,
     new DigitalInput(PivotConstants.DIO.kLimitSwitchLower),
     new DigitalInput(PivotConstants.DIO.kLimitSwitchUpper),
-    new SmartMotorControllerGroup<>(
-      PivotConstants.kIsInverted,
-      0.0, // multiplier is unused; SMCG only used as container
-      (master, follower) -> follower.setControl(new Follower(master.getDeviceID(), false)),
-      new TalonFX(PivotConstants.CAN.kMotorPortA),
-      new TalonFX(PivotConstants.CAN.kMotorPortB)
-    )
+    new TalonFX(PivotConstants.CAN.kMotorPortA),
+    new TalonFX(PivotConstants.CAN.kMotorPortB)
   );
 
   private final ArmCommand m_armCommand = new ArmCommand(

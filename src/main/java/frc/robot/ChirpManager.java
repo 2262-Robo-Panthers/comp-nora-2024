@@ -12,7 +12,6 @@ import edu.wpi.first.networktables.Topic;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -22,7 +21,6 @@ import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.subsystems.ShoulderSubsystem;
-import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
 import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class ChirpManager {
@@ -37,15 +35,14 @@ public class ChirpManager {
   private boolean m_isEnabled = false;
   private boolean m_wasInterrupted = false;
 
-  @SuppressWarnings("unchecked")
   public ChirpManager(ShuffleboardTab shuffleboardTab, ShoulderSubsystem shoulder, Orchestra orchestra, String name, int x, int y, String... songs) {
     m_shoulder = shoulder;
     m_orchestra = orchestra;
     m_name = name;
     m_songs = songs;
 
-    for (MotorController controller : ((SmartMotorControllerGroup<TalonFX>) m_shoulder.getPivot()).getControllers()) {
-      m_orchestra.addInstrument((TalonFX) controller);
+    for (TalonFX controller : m_shoulder.getControllers()) {
+      m_orchestra.addInstrument(controller);
     }
 
     loadCurrentSong();

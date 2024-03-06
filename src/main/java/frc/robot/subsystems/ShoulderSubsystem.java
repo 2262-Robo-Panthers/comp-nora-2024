@@ -18,8 +18,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import frc.robot.lib.SmartMotorController.SmartMotorController;
-import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
 import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class ShoulderSubsystem extends SubsystemBase {
@@ -33,38 +31,34 @@ public class ShoulderSubsystem extends SubsystemBase {
   private final DigitalInput m_limitSwitchLower;
   private final DigitalInput m_limitSwitchUpper;
 
-  private final SmartMotorController m_controller;
   private TalonFX[] m_talons;
   private TalonFX m_master;
 
   public ShoulderSubsystem(
     ShuffleboardTab shuffleboardTab,
-    double totalRange, double hyperextension,
+    boolean isInverted, double totalRange, double hyperextension,
     double p, double i, double d,
     DigitalInput limitSwitchLower, DigitalInput limitSwitchUpper,
-    SmartMotorController controller
+    TalonFX... talons
   ) {
     m_totalRange = totalRange;
     m_hyperextension = hyperextension;
 
     m_limitSwitchLower = limitSwitchLower;
     m_limitSwitchUpper = limitSwitchUpper;
+    m_talons = talons;
 
-    m_controller = controller;
+    for (TalonFX controller : talons) {
+      controller.setInverted(isInverted);
+    }
 
     setupPid(p, i, d);
     setupLimits();
 
     populateDashboard(shuffleboardTab);
-
-    populateDashboard(shuffleboardTab);
   }
 
-  @SuppressWarnings("unchecked")
   private void setupPid(double p, double i, double d) {
-    m_talons = (TalonFX[]) ((SmartMotorControllerGroup<TalonFX>) m_controller).getControllers();
-    m_master = m_talons[0];
-
     Slot0Configs config = new Slot0Configs();
     config.kP = p;
     config.kI = i;
@@ -120,7 +114,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     m_positionZero = m_master.getPosition().getValue() - position * m_totalRange;
   }
 
-  public SmartMotorController getPivot() {
-    return m_controller;
+  public TalonFX[] getControllers() {
+    return m_talons;
   }
 }
