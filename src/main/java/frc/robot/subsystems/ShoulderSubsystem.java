@@ -9,47 +9,59 @@ import java.util.List;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class ShoulderSubsystem extends SubsystemBase {
-  private final double m_totalRange;
-  private final double m_hyperextension;
-  private final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
-
-  private double m_positionNow;
-  private double m_positionZero;
+  private final double m_limitLower;
+  private final double m_limitUpper;
 
   private final DigitalInput m_limitSwitchLower;
   private final DigitalInput m_limitSwitchUpper;
+  private final DutyCycleEncoder m_encoder;
 
-  private TalonFX[] m_talons;
-  private TalonFX m_master;
+  private final TalonFX[] m_talons;
+  private final TalonFX m_master;
+
+  private final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
+
+  private double m_positionNow;
+  private double m_positionLower;
+  private double m_positionUpper;
 
   public ShoulderSubsystem(
     ShuffleboardTab shuffleboardTab,
-    boolean isInverted, double totalRange, double hyperextension,
+    boolean isInverted, double limitLower, double limitUpper,
     double p, double i, double d,
     DigitalInput limitSwitchLower, DigitalInput limitSwitchUpper,
+    DutyCycleEncoder encoder,
     TalonFX... talons
   ) {
-    m_totalRange = totalRange;
-    m_hyperextension = hyperextension;
+    m_limitLower = limitLower;
+    m_limitUpper = limitUpper;
 
     m_limitSwitchLower = limitSwitchLower;
     m_limitSwitchUpper = limitSwitchUpper;
+    m_encoder = encoder;
+
     m_talons = talons;
+    m_master = talons[0];
 
     for (TalonFX controller : talons) {
       controller.setInverted(isInverted);
+
+      if (controller != m_master)
+        controller.setControl(new Follower(m_master.getDeviceID(), false));
     }
 
     setupPid(p, i, d);
