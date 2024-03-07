@@ -153,7 +153,11 @@ public class RobotContainer {
       AutoCommandFactory.Leave(m_driveSubsystem)
     );
     addOption(
-      "Preload\u00bbSpeaker",
+      "Preload\u00bbSpeaker, Leave",
+      AutoCommandFactory.SpeakerLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
+    );
+    addOption(
+      "Preload\u00bbSpeaker, Ground\u00bbIntake, Leave",
       AutoCommandFactory.SpeakerLoadLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
     );
   }};
