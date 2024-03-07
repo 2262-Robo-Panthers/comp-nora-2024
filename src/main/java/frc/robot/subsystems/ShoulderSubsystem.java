@@ -16,8 +16,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import frc.robot.Constants.PivotConstants;
 import frc.robot.util.ShuffleboardTabWithMaps;
 
 public class ShoulderSubsystem extends SubsystemBase {
@@ -34,9 +36,15 @@ public class ShoulderSubsystem extends SubsystemBase {
   private TalonFX[] m_talons;
   private TalonFX m_master;
 
+  public enum Extremum {
+    kLower,
+    kUpper;
+  };
+
   public ShoulderSubsystem(
     ShuffleboardTab shuffleboardTab,
-    boolean isInverted, double totalRange, double hyperextension,
+    boolean isInverted,
+    double totalRange, double hyperextension,
     double p, double i, double d,
     DigitalInput limitSwitchLower, DigitalInput limitSwitchUpper,
     TalonFX... talons
@@ -47,13 +55,14 @@ public class ShoulderSubsystem extends SubsystemBase {
     m_limitSwitchLower = limitSwitchLower;
     m_limitSwitchUpper = limitSwitchUpper;
     m_talons = talons;
+    m_master = talons[0];
 
     for (TalonFX controller : talons) {
       controller.setInverted(isInverted);
     }
 
     setupPid(p, i, d);
-    setupLimits();
+    setupTriggers();
 
     populateDashboard(shuffleboardTab);
   }
@@ -71,7 +80,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     resetPosition(0.5);
   }
 
-  private void setupLimits() {
+  private void setupTriggers() {
     new Trigger(m_limitSwitchLower::get)
       .onFalse(new InstantCommand(() -> {
         resetPosition(0.0);
@@ -90,16 +99,16 @@ public class ShoulderSubsystem extends SubsystemBase {
       new Pair<>("Hit Lower", m_limitSwitchLower::get),
       new Pair<>("Hit Upper", m_limitSwitchUpper::get)
     ), false)
-      .withPosition(4, 2)
-      .withSize(2, 3)
-      .addDouble("Position Requested", () -> m_positionNow * m_totalRange)
-      .getParent()
-      .addDouble("Position Reported", () -> m_master.getPosition().asSupplier().get() - m_positionZero);
+      .withPosition(6, 2)
+      .withSize(2, 4)
+      .addDouble("Position Requested", () -> m_positionNow * m_totalRange).getParent()
+      .addDouble("Position Reported", () -> m_master.getPosition().asSupplier().get() - m_positionZero).getParent()
+      .addDouble("Motor Temperature", this::getHighestMotorTemperature);
   }
 
   public void movePivotPosition(double positionDelta) {
     setPivotPosition(MathUtil.clamp(
-      m_positionNow + positionDelta * 0.01,
+      m_positionNow + positionDelta * PivotConstants.kSensitivity,
       0.0 - m_hyperextension,
       1.0 + m_hyperextension
     ));
@@ -112,6 +121,25 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   public void resetPosition(double position) {
     m_positionZero = m_master.getPosition().getValue() - position * m_totalRange;
+  }
+
+  public void neutralizeMotors() {
+    m_master.setControl(new NeutralOut());
+  }
+
+  public boolean isAtLimitLower() {
+    return !m_limitSwitchLower.get();
+  }
+
+  public boolean isAtLimitUpper() {
+    return !m_limitSwitchUpper.get();
+  }
+
+  public double getHighestMotorTemperature() {
+    return Math.max(
+      m_talons[0].getDeviceTemp().getValue(),
+      m_talons[1].getDeviceTemp().getValue()
+    );
   }
 
   public TalonFX[] getControllers() {

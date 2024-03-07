@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,9 +19,10 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import frc.robot.commands.AutoCommand;
+import frc.robot.commands.AutoCommandFactory;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.DriveCommand;
+import frc.robot.commands.HomeCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -145,6 +147,17 @@ public class RobotContainer {
     "music/star-spangled-banner"
   );
 
+  private final SendableChooser<Command> m_autoChooser = new SendableChooser<>() {{
+    setDefaultOption(
+      "Leave",
+      AutoCommandFactory.Leave(m_driveSubsystem)
+    );
+    addOption(
+      "Preload\u00bbSpeaker",
+      AutoCommandFactory.SpeakerLoadLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
+    );
+  }};
+
   public RobotContainer() {
     m_driveSubsystem.setReferencePlane(true);
 
@@ -167,6 +180,13 @@ public class RobotContainer {
     m_driverController.a()
       .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(0.0)), m_driveSubsystem));
 
+    m_endEffectorController.povUp()
+      .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kUpper));
+    m_endEffectorController.povDown()
+      .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kLower));
+    m_endEffectorController.povLeft()
+      .onTrue(new InstantCommand(m_shoulderSubsystem::neutralizeMotors));
+
     m_endEffectorController.start()
       .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));
     m_endEffectorController.back()
@@ -183,6 +203,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return AutoCommand.basicMove(m_driveSubsystem);
+    return m_autoChooser.getSelected();
   }
 }
