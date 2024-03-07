@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.util.FunctionalUtil;
-import frc.robot.util.ShuffleboardTabWithMaps;
+import frc.robot.util.ShuffleboardHelper;
+import frc.robot.util.ShuffleboardHelper.DataPoint;
 
 public class DriveCommand extends Command {
   private final DriveSubsystem m_drive;
@@ -43,10 +43,10 @@ public class DriveCommand extends Command {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, "Drive Controls", "%.3f", List.of(
-      new Pair<>("Strafe X", m_strafeX),
-      new Pair<>("Strafe Y", m_strafeY),
-      new Pair<>("Rotation", m_rotation)
+    ShuffleboardHelper.add(dashboard, "Drive Controls", List.of(
+      DataPoint.ofDouble("Strafe X", ".3", "", m_strafeX),
+      DataPoint.ofDouble("Strafe Y", ".3", "", m_strafeY),
+      DataPoint.ofDouble("Rotation", ".3", "", m_rotation)
     ))
       .withPosition(0, 0)
       .withSize(2, 2);

@@ -7,7 +7,6 @@ package frc.robot;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.networktables.Topic;
 import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -21,7 +20,8 @@ import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.subsystems.ShoulderSubsystem;
-import frc.robot.util.ShuffleboardTabWithMaps;
+import frc.robot.util.ShuffleboardHelper;
+import frc.robot.util.ShuffleboardHelper.DataPoint;
 
 public class ChirpManager {
   private final ShoulderSubsystem m_shoulder;
@@ -52,9 +52,9 @@ public class ChirpManager {
 
   private void populateDashboard(ShuffleboardTab dashboard, int x, int y) {
     Topic isEnabled =
-    ShuffleboardTabWithMaps.addMap(dashboard, "ChirpManager." + m_name, "%s", List.of(
-      new Pair<>("State", () -> m_orchestra.isPlaying() ? "playing" : "paused"),
-      new Pair<>("CurrentSong", () -> m_songs[m_currentSong])
+    ShuffleboardHelper.add(dashboard, "ChirpManager." + m_name, List.of(
+      DataPoint.ofBoolean("IsPlaying", m_orchestra::isPlaying),
+      DataPoint.ofString("CurrentSong", () -> m_songs[m_currentSong])
     ))
       .withPosition(x, y)
       .withSize(2, 2)

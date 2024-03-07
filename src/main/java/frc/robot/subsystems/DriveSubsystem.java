@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,15 +17,17 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import static edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis.kZ;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.util.WPIUtilJNI;
+
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.MAXSwerve.SwerveUtils;
-import frc.robot.util.ShuffleboardTabWithMaps;
+import frc.robot.util.ShuffleboardHelper;
+import frc.robot.util.ShuffleboardHelper.DataPoint;
 
 public class DriveSubsystem extends SubsystemBase {
   private final double m_maxSpeedLin;
@@ -98,17 +99,17 @@ public class DriveSubsystem extends SubsystemBase {
       .withWidget(BuiltInWidgets.kToggleButton)
       .getEntry();
 
-    ShuffleboardTabWithMaps.addMap(dashboard, "Pose", this::getPose, List.of(
-      new Pair<>("X Position", new Pair<>("%.3f m", pose -> pose.getX())),
-      new Pair<>("Y Position", new Pair<>("%.3f m", pose -> pose.getY())),
-      new Pair<>("Orientation", new Pair<>("%.3f\u00b0", pose -> pose.getRotation().getDegrees()))
+    ShuffleboardHelper.add(dashboard, "Pose", this::getPose, List.of(
+      DataPoint.ofDouble("X Position", "%.3f", "m", pose -> pose.getX()),
+      DataPoint.ofDouble("Y Position", "%.3f", "m", pose -> pose.getY()),
+      DataPoint.ofDouble("Orientation", "%.3f", "\u00b0", pose -> pose.getRotation().getDegrees())
     ))
       .withPosition(2, 0)
       .withSize(2, 2);
 
-    ShuffleboardTabWithMaps.addMap(dashboard, "Gyro", List.of(
-      new Pair<>("Angular Position", new Pair<>("%.3f\u00b0", this::getRotation_deg)),
-      new Pair<>("Angular Velocity", new Pair<>("%.3f\u00b0/s", this::getRotationRate_deg_s))
+    ShuffleboardHelper.add(dashboard, "Gyro", List.of(
+      DataPoint.ofDouble("Angular Position", "%.3f", "\u00b0", this::getRotation_deg),
+      DataPoint.ofDouble("Angular Velocity", "%.3f", "\u00b0/s", this::getRotationRate_deg_s)
     ))
       .withPosition(4, 0)
       .withSize(2, 2);

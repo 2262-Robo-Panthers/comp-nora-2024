@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import java.util.List;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -20,7 +19,8 @@ import com.ctre.phoenix6.controls.NeutralOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.Constants.PivotConstants;
-import frc.robot.util.ShuffleboardTabWithMaps;
+import frc.robot.util.ShuffleboardHelper;
+import frc.robot.util.ShuffleboardHelper.DataPoint;
 
 public class ShoulderSubsystem extends SubsystemBase {
   private final double m_totalRange;
@@ -95,10 +95,10 @@ public class ShoulderSubsystem extends SubsystemBase {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, "Pivot", List.of(
-      new Pair<>("Hit Lower", m_limitSwitchLower::get),
-      new Pair<>("Hit Upper", m_limitSwitchUpper::get)
-    ), false)
+    ShuffleboardHelper.add(dashboard, "Pivot", List.of(
+      DataPoint.ofBoolean("Hit Lower", m_limitSwitchLower::get),
+      DataPoint.ofBoolean("Hit Upper", m_limitSwitchUpper::get)
+    ))
       .withPosition(6, 2)
       .withSize(2, 4)
       .addDouble("Position Requested", () -> m_positionNow * m_totalRange).getParent()
