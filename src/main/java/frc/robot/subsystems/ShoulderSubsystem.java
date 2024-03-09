@@ -30,6 +30,8 @@ public class ShoulderSubsystem extends SubsystemBase {
   private double m_positionNow;
   private double m_positionZero;
 
+  private boolean m_isNeutralized = false;
+
   private final DigitalInput m_limitSwitchLower;
   private final DigitalInput m_limitSwitchUpper;
 
@@ -76,8 +78,6 @@ public class ShoulderSubsystem extends SubsystemBase {
     for (TalonFX controller : m_talons) {
       controller.getConfigurator().apply(config);
     }
-
-    resetPosition(0.5);
   }
 
   private void setupTriggers() {
@@ -99,32 +99,63 @@ public class ShoulderSubsystem extends SubsystemBase {
       new Pair<>("Hit Lower", m_limitSwitchLower::get),
       new Pair<>("Hit Upper", m_limitSwitchUpper::get)
     ), false)
-      .withPosition(6, 2)
+      .withPosition(6, 0)
       .withSize(2, 4)
       .addDouble("Position Requested", () -> m_positionNow * m_totalRange).getParent()
       .addDouble("Position Reported", () -> m_master.getPosition().asSupplier().get() - m_positionZero).getParent()
+      .addDouble("Position Zero", () -> m_positionZero).getParent()
       .addDouble("Motor Temperature", this::getHighestMotorTemperature);
   }
 
   public void movePivotPosition(double positionDelta) {
-    setPivotPosition(MathUtil.clamp(
-      m_positionNow + positionDelta * PivotConstants.kSensitivity,
-      0.0 - m_hyperextension,
-      1.0 + m_hyperextension
-    ));
+    setPivotPosition(
+      MathUtil.clamp(
+        m_positionNow + positionDelta * PivotConstants.kSensitivity,
+        0.0 - m_hyperextension,
+        1.0 + m_hyperextension
+      )
+    );
   }
 
   public void setPivotPosition(double position) {
     m_positionNow = position;
-    m_master.setControl(m_request.withPosition(m_positionZero + position * m_totalRange));
+
+    if (m_isNeutralized)
+      return;
+
+    m_master.setControl(
+      m_request.withPosition(m_positionZero + m_totalRange * m_positionNow)
+    );
+  }
+
+  public void resetPosition(double position, boolean stayStill) {
+    m_positionZero = m_master.getPosition().getValue() - position * m_totalRange;
+
+    if (stayStill)
+      setPivotPosition(position);
   }
 
   public void resetPosition(double position) {
-    m_positionZero = m_master.getPosition().getValue() - position * m_totalRange;
+    resetPosition(position, true);
+  }
+
+  public void resetPositionToLower() {
+    resetPosition(0.0);
+    System.out.println("A");
+  }
+
+  public void resetPositionToUpper() {
+    resetPosition(1.0);
+    System.out.println("B");
   }
 
   public void neutralizeMotors() {
     m_master.setControl(new NeutralOut());
+    m_isNeutralized = true;
+  }
+
+  public void deneutralizeMotors() {
+    m_isNeutralized = false;
   }
 
   public boolean isAtLimitLower() {

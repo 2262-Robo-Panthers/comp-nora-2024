@@ -36,7 +36,7 @@ public class HomeCommand extends Command {
       m_shouldBackOff = false;
     }
 
-    m_shoulder.movePivotPosition(0.05 * (m_preferredDirection == Extremum.kLower ^ m_shouldBackOff ? -1 : 1));
+    m_shoulder.movePivotPosition(0.5 * (m_preferredDirection == Extremum.kLower ^ m_shouldBackOff ? -1 : 1));
   }
 
   @Override

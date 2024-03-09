@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,6 +22,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.commands.AutoCommandFactory;
 import frc.robot.commands.ArmCommand;
+import frc.robot.commands.ShoulderCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.commands.HomeCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -115,12 +117,17 @@ public class RobotContainer {
 
   private final ArmCommand m_armCommand = new ArmCommand(
     m_dashboard,
-    m_armSubsystem, m_shoulderSubsystem,
-    () ->
-      m_endEffectorController.getRightTriggerAxis() -
-      m_endEffectorController.getLeftTriggerAxis(),
+    m_armSubsystem,
     m_endEffectorController::getRightY,
     m_endEffectorController::getLeftY
+  );
+
+  private final ShoulderCommand m_shoulderCommand = new ShoulderCommand(
+    m_dashboard,
+    m_shoulderSubsystem,
+    () ->
+      m_endEffectorController.getRightTriggerAxis() -
+      m_endEffectorController.getLeftTriggerAxis()
   );
 
   private final Orchestra m_orchestra = new Orchestra();
@@ -129,7 +136,7 @@ public class RobotContainer {
     m_dashboard,
     m_shoulderSubsystem,
     m_orchestra,
-    "SFX", 6, 0,
+    "SFX", 8, 0,
     "game-sounds/start-auto",
     "game-sounds/start-teleop",
     "game-sounds/match-end"
@@ -139,7 +146,7 @@ public class RobotContainer {
     m_dashboard,
     m_shoulderSubsystem,
     m_orchestra,
-    "Music", 6, 2,
+    "Music", 10, 0,
     "music/happy-birthday",
     "music/mary-had-a-little-lamb",
     "music/twinkle-twinkle",
@@ -153,7 +160,11 @@ public class RobotContainer {
       AutoCommandFactory.Leave(m_driveSubsystem)
     );
     addOption(
-      "Preload\u00bbSpeaker",
+      "Preload\u00bbSpeaker, Leave",
+      AutoCommandFactory.SpeakerLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
+    );
+    addOption(
+      "Preload\u00bbSpeaker, Ground\u00bbIntake, Leave",
       AutoCommandFactory.SpeakerLoadLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
     );
   }};
@@ -163,8 +174,19 @@ public class RobotContainer {
 
     m_driveSubsystem.setDefaultCommand(m_driveCommand);
     m_armSubsystem.setDefaultCommand(m_armCommand);
+    m_shoulderSubsystem.setDefaultCommand(m_shoulderCommand);
+
+    populateDashboard();
 
     configureBindings();
+  }
+
+  private void populateDashboard() {
+    m_dashboard
+      .add("Choose Auto", m_autoChooser)
+      .withWidget(BuiltInWidgets.kComboBoxChooser)
+      .withPosition(8, 2)
+      .withSize(4, 2);
   }
 
   private void configureBindings() {
@@ -184,8 +206,14 @@ public class RobotContainer {
       .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kUpper));
     m_endEffectorController.povDown()
       .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kLower));
+    m_endEffectorController.leftBumper()
+      .onTrue(new InstantCommand(m_shoulderSubsystem::resetPositionToLower, m_shoulderSubsystem));
+    m_endEffectorController.rightBumper()
+      .onTrue(new InstantCommand(m_shoulderSubsystem::resetPositionToUpper, m_shoulderSubsystem));
     m_endEffectorController.povLeft()
-      .onTrue(new InstantCommand(m_shoulderSubsystem::neutralizeMotors));
+      .onTrue(new InstantCommand(m_shoulderSubsystem::neutralizeMotors, m_shoulderSubsystem));
+    m_endEffectorController.povRight()
+      .onTrue(new InstantCommand(m_shoulderSubsystem::deneutralizeMotors, m_shoulderSubsystem));
 
     m_endEffectorController.start()
       .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));
