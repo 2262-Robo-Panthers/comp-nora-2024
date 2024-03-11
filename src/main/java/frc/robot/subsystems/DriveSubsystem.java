@@ -88,13 +88,13 @@ public class DriveSubsystem extends SubsystemBase {
 
   private void populateDashboard(ShuffleboardTab dashboard) {
     dashboard.addBoolean("IsXFormation", () -> m_isXFormation)
-      .withPosition(2, 3)
-      .withSize(2, 1);
+      .withPosition(4, 2)
+      .withSize(2, 2);
 
     m_isFieldRelative =
     dashboard.add("IsFieldRelative", false)
       .withPosition(2, 2)
-      .withSize(2, 1)
+      .withSize(2, 2)
       .withWidget(BuiltInWidgets.kToggleButton)
       .getEntry();
 

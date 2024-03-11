@@ -11,53 +11,37 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.util.ShuffleboardTabWithMaps;
 
-public class ArmCommand extends Command {
-  private final ArmSubsystem m_arm;
+public class ShoulderCommand extends Command {
+  private final ShoulderSubsystem m_shoulder;
 
-  private final Supplier<Double> m_intake;
-  private final Supplier<Double> m_launch;
+  private final Supplier<Double> m_pivot;
 
-  public ArmCommand(
+  public ShoulderCommand(
     ShuffleboardTab shuffleboardTab,
-    ArmSubsystem arm,
-    Supplier<Double> intake, Supplier<Double> launch
+    ShoulderSubsystem shoulder,
+    Supplier<Double> pivot
   ) {
-    m_arm = arm;
+    m_shoulder = shoulder;
 
-    m_intake = intake;
-    m_launch = launch;
+    m_pivot = pivot;
 
     populateDashboard(shuffleboardTab);
 
-    addRequirements(arm);
+    addRequirements(shoulder);
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
     ShuffleboardTabWithMaps.addMap(dashboard, "EEor Controls", "%.3f", List.of(
-      new Pair<>("Intake", m_intake),
-      new Pair<>("Launch", m_launch)
-    ))
-      .withPosition(0, 2)
-      .withSize(2, 2);
-  }
-
-  @Override
-  public void initialize() {
-    m_arm.stop();
+      new Pair<>("dPivot", m_pivot)
+    ));
   }
 
   @Override
   public void execute() {
-    m_arm.setIntakeSpeed(m_intake.get());
-    m_arm.setLaunchSpeed(m_launch.get());
-  }
-
-  @Override
-  public void end(boolean interrupted) {
-    m_arm.stop();
+    m_shoulder.movePivotPosition(m_pivot.get());
   }
 
   @Override

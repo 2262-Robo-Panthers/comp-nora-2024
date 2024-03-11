@@ -15,8 +15,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.NeutralOut;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.Constants.PivotConstants;
@@ -29,6 +30,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   private double m_positionNow;
   private double m_positionZero;
+  private boolean m_isNeutralized = false;
 
   private final DigitalInput m_limitSwitchLower;
   private final DigitalInput m_limitSwitchUpper;
@@ -57,12 +59,22 @@ public class ShoulderSubsystem extends SubsystemBase {
     m_talons = talons;
     m_master = talons[0];
 
+    // talons[1].setControl(new Follower(m_master.getDeviceID(), false));
+
+    Follower follower = new Follower(m_master.getDeviceID(), false);
+
     for (TalonFX controller : talons) {
       controller.setInverted(isInverted);
+
+      if (controller != m_master) {
+        controller.setControl(follower);
+      }
     }
 
     setupPid(p, i, d);
     setupTriggers();
+
+    resetPosition(1.0);
 
     populateDashboard(shuffleboardTab);
   }
@@ -76,21 +88,17 @@ public class ShoulderSubsystem extends SubsystemBase {
     for (TalonFX controller : m_talons) {
       controller.getConfigurator().apply(config);
     }
-
-    resetPosition(0.5);
   }
 
   private void setupTriggers() {
     new Trigger(m_limitSwitchLower::get)
       .onFalse(new InstantCommand(() -> {
         resetPosition(0.0);
-        setPivotPosition(0.0);
       }, this));
 
     new Trigger(m_limitSwitchUpper::get)
       .onFalse(new InstantCommand(() -> {
         resetPosition(1.0);
-        setPivotPosition(1.0);
       }, this));
   }
 
@@ -99,10 +107,11 @@ public class ShoulderSubsystem extends SubsystemBase {
       new Pair<>("Hit Lower", m_limitSwitchLower::get),
       new Pair<>("Hit Upper", m_limitSwitchUpper::get)
     ), false)
-      .withPosition(6, 2)
+      .withPosition(6, 0)
       .withSize(2, 4)
       .addDouble("Position Requested", () -> m_positionNow * m_totalRange).getParent()
-      .addDouble("Position Reported", () -> m_master.getPosition().asSupplier().get() - m_positionZero).getParent()
+      .addDouble("Position Reported", () -> m_master.getPosition().getValue() - m_positionZero).getParent()
+      .addDouble("Position Zero", () -> m_positionZero).getParent()
       .addDouble("Motor Temperature", this::getHighestMotorTemperature);
   }
 
@@ -116,15 +125,25 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   public void setPivotPosition(double position) {
     m_positionNow = position;
-    m_master.setControl(m_request.withPosition(m_positionZero + position * m_totalRange));
+
+    if (m_isNeutralized)
+      return;
+
+    m_master.setControl(m_request.withPosition(m_positionZero + m_positionNow * m_totalRange));
   }
 
   public void resetPosition(double position) {
     m_positionZero = m_master.getPosition().getValue() - position * m_totalRange;
+    setPivotPosition(position);
   }
 
   public void neutralizeMotors() {
+    m_isNeutralized = true;
     m_master.setControl(new NeutralOut());
+  }
+
+  public void deneutralizeMotors() {
+    m_isNeutralized = false;
   }
 
   public boolean isAtLimitLower() {

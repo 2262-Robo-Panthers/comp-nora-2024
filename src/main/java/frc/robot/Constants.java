@@ -83,7 +83,7 @@ public final class Constants {
   public static class PivotConstants {
     public static final boolean kIsInverted = true;
     public static final double kRange = 14.0;
-    public static final double kHyperextension = 0.08; // 8% of total range
+    public static final double kHyperextension = 0.1; // 10% of total range
     public static final double kSensitivity = 0.01;
 
     public static final double kP = 0.7;
