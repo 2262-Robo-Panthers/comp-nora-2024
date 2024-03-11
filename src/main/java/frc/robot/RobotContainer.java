@@ -159,6 +159,10 @@ public class RobotContainer {
       "Leave",
       AutoCommandFactory.Leave(m_driveSubsystem)
     );
+    addOption(
+      "Preload\u00bbSpeaker, Leave",
+      AutoCommandFactory.SpeakerLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
+    );
     // addOption(
     //   "Preload\u00bbSpeaker, Ground\u00bbIntake, Leave",
     //   AutoCommandFactory.SpeakerLoadLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
@@ -203,13 +207,14 @@ public class RobotContainer {
     m_endEffectorController.povDown()
       .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kLower));
     m_endEffectorController.leftBumper()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(0.0)));
+      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(0.0), m_shoulderSubsystem));
     m_endEffectorController.rightBumper()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(1.0)));
+      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(1.0), m_shoulderSubsystem));
     m_endEffectorController.povLeft()
-      .onTrue(new InstantCommand(m_shoulderSubsystem::neutralizeMotors));
+      .onTrue(new InstantCommand(m_shoulderSubsystem::neutralizeMotors, m_shoulderSubsystem)
+      .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
     m_endEffectorController.povRight()
-      .onTrue(new InstantCommand(m_shoulderSubsystem::deneutralizeMotors));
+      .onTrue(new InstantCommand(m_shoulderSubsystem::deneutralizeMotors, m_shoulderSubsystem));
 
     m_endEffectorController.start()
       .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));

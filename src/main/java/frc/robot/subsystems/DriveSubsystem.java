@@ -135,8 +135,12 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void usePoseRotation(Rotation2d rotation) {
-    usePose(new Pose2d(m_odometry.getPoseMeters().getTranslation(), rotation));
     m_gyro.setGyroAngle(kZ, rotation.getRadians());
+    usePose(new Pose2d(m_odometry.getPoseMeters().getTranslation(), rotation));
+  }
+
+  public void discardGyroDrift() {
+    usePoseRotation(new Rotation2d(0.0));
   }
 
   public double getRotation_deg() {

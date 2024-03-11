@@ -59,8 +59,6 @@ public class ShoulderSubsystem extends SubsystemBase {
     m_talons = talons;
     m_master = talons[0];
 
-    // talons[1].setControl(new Follower(m_master.getDeviceID(), false));
-
     Follower follower = new Follower(m_master.getDeviceID(), false);
 
     for (TalonFX controller : talons) {

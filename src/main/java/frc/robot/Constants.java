@@ -16,6 +16,32 @@ public final class Constants {
     }
   }
 
+  public static class AutoConstants {
+    // Values acquired by testing
+    public static final double kSpeakerFrontAim = 0.121;
+    public static final double kSpeakerSideAim = 0.164;
+
+    public static final double kIntakeDistance = Units.inchesToMeters(5.0);
+
+    public static final double kNoteOuterRadius = Units.inchesToMeters(14.0 / 2.0);
+
+    public static final double kDistanceSpeakerToLeave = Units.inchesToMeters(39.93);
+    public static final double kDistanceLeaveToNote = Units.inchesToMeters(39.90);
+
+    public static final double kDriveSpeakerToNote
+      = kDistanceSpeakerToLeave
+      + kDistanceLeaveToNote
+      - DriveConstants.kChassisLength
+      - 2 * DriveConstants.kBumperThickness
+      - kIntakeDistance
+      - kNoteOuterRadius;
+
+    public static final double kDriveNoteToLeave
+      = kDistanceSpeakerToLeave
+      - kDriveSpeakerToNote
+      + 0.5; // Extra distance to be safe
+  }
+
   public static class DriveConstants {
     public static final double kMaxSpeedLin_m_s = 2.4;
     public static final double kMaxSpeedAng_rad_s = 2 * Math.PI;
@@ -26,8 +52,12 @@ public final class Constants {
 
     public static final boolean kIsGyroReversed = false;
 
+    // TODO verify this
     public static final double kTrackWidth  = Units.inchesToMeters(25.0); // Distance between left and right wheels
     public static final double kTrackLength = Units.inchesToMeters(24.5); // Distance between front and back wheels
+    public static final double kChassisWidth  = Units.inchesToMeters(28.0);
+    public static final double kChassisLength = Units.inchesToMeters(28.0);
+    public static final double kBumperThickness = Units.inchesToMeters(3.0);
 
     // Values are offset by 1/2 to center the robot on the origin
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(

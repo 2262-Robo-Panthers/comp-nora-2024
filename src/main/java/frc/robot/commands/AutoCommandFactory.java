@@ -43,47 +43,47 @@ public class AutoCommandFactory {
     );
   }
 
-  private static Command speaker(ArmSubsystem arm, ShoulderSubsystem shoulder, double aimPosition) {
-    return
-      new InstantCommand(() -> shoulder.setPivotPosition(aimPosition), shoulder)
-      .alongWith(
-      new WaitCommand(2.0))
+  // private static Command speaker(ArmSubsystem arm, ShoulderSubsystem shoulder, double aimPosition) {
+  //   return
+  //     new InstantCommand(() -> shoulder.setPivotPosition(aimPosition), shoulder)
+  //     .alongWith(
+  //     new WaitCommand(2.0))
       
-      .andThen(
+  //     .andThen(
 
-      new InstantCommand(() -> arm.setLaunchSpeed(1.0), arm)
-      .alongWith(
-      new WaitCommand(2.0)))
+  //     new InstantCommand(() -> arm.setLaunchSpeed(1.0), arm)
+  //     .alongWith(
+  //     new WaitCommand(2.0)))
       
-      .andThen(
+  //     .andThen(
 
-      new InstantCommand(() -> arm.setIntakeSpeed(1.0), arm)
-      .alongWith(
-      new WaitCommand(2.0)));
-  }
+  //     new InstantCommand(() -> arm.setIntakeSpeed(1.0), arm)
+  //     .alongWith(
+  //     new WaitCommand(2.0)));
+  // }
 
-  private static Command loadFromGround(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
-    return
-      new InstantCommand(() -> shoulder.setPivotPosition(0.0), shoulder)
-      .alongWith(
-      new WaitCommand(2.0))
+  // private static Command loadFromGround(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
+  //   return
+  //     new InstantCommand(() -> shoulder.setPivotPosition(0.0), shoulder)
+  //     .alongWith(
+  //     new WaitCommand(2.0))
 
-      .andThen(
+  //     .andThen(
 
-      new InstantCommand(() -> arm.setIntakeSpeed(0.7), arm)
-      .alongWith(
-      new WaitCommand(1.0)))
+  //     new InstantCommand(() -> arm.setIntakeSpeed(0.7), arm)
+  //     .alongWith(
+  //     new WaitCommand(1.0)))
 
-      .andThen(
+  //     .andThen(
 
-      new InstantCommand(() -> arm.setIntakeSpeed(0.0), arm));
-  }
+  //     new InstantCommand(() -> arm.setIntakeSpeed(0.0), arm));
+  // }
 
   /********************************/
 
   public static Command Leave(DriveSubsystem drive) {
     return
-      new InstantCommand(() -> drive.usePoseRotation(new Rotation2d(0.0)), drive)
+      new InstantCommand(drive::discardGyroDrift, drive)
 
       .andThen(
 
@@ -95,7 +95,7 @@ public class AutoCommandFactory {
 
   public static Command SpeakerLeave(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
     return
-      new InstantCommand(() -> drive.usePoseRotation(new Rotation2d(0.0)), drive)
+      new InstantCommand(drive::discardGyroDrift, drive)
 
       .andThen(
 
@@ -103,31 +103,21 @@ public class AutoCommandFactory {
 
       .andThen(
 
-      new InstantCommand(() -> shoulder.setPivotPosition(0.5))
+      new InstantCommand(() -> shoulder.setPivotPosition(AutoConstants.kSpeakerFrontAim), shoulder)
       .alongWith(
-      new WaitCommand(2.0)))
+      new WaitCommand(1.5)))
 
       .andThen(
 
       new InstantCommand(() -> arm.setLaunchSpeed(1.0), arm)
       .alongWith(
-      new WaitCommand(2.0)))
+      new WaitCommand(1.5)))
 
       .andThen(
 
       new InstantCommand(() -> arm.setIntakeSpeed(1.0), arm)
       .alongWith(
       new WaitCommand(2.0)))
-
-      .andThen(
-
-      movementHelper(drive, List.of(
-        new Pose2d(0.0, 0.0, new Rotation2d(0.0)),
-        new Pose2d(0.5, 0.0, new Rotation2d(0.0)))))
-
-      .andThen(
-
-      loadFromGround(drive, arm, shoulder))
 
       .andThen(
 

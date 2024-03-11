@@ -25,15 +25,18 @@ public class HomeCommand extends Command {
   @Override
   public void initialize() {
     m_shouldBackOff = m_shoulder.isAtLimitLower() ^ m_shoulder.isAtLimitUpper();
+
+    System.out.printf("HomeCommand prefers %s %s to back off.\n",
+      m_preferredDirection.toString(),
+      m_shouldBackOff ? "but needs" : "and doesn't need");
   }
 
   @Override
   public void execute() {
-    if (!m_shoulder.isAtLimitLower() && m_preferredDirection == Extremum.kLower) {
+    if ((!m_shoulder.isAtLimitLower() && m_preferredDirection == Extremum.kLower)
+      || (!m_shoulder.isAtLimitUpper() && m_preferredDirection == Extremum.kUpper)) {
       m_shouldBackOff = false;
-    }
-    else if (!m_shoulder.isAtLimitUpper() && m_preferredDirection == Extremum.kUpper) {
-      m_shouldBackOff = false;
+      System.out.println("HomeCommand finished backing off.");
     }
 
     m_shoulder.movePivotPosition(0.7 * (m_preferredDirection == Extremum.kLower ^ m_shouldBackOff ? -1 : 1));
@@ -45,5 +48,11 @@ public class HomeCommand extends Command {
       (m_shoulder.isAtLimitLower() && m_preferredDirection == Extremum.kLower) ||
       (m_shoulder.isAtLimitUpper() && m_preferredDirection == Extremum.kUpper)
     );
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    System.out.printf("HomeCommand %s.\n",
+      interrupted ? "was interrupted" : "is completed");
   }
 }
