@@ -23,10 +23,12 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import static edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis.kZ;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.MAXSwerve.SwerveUtils;
 import frc.robot.util.ShuffleboardTabWithMaps;
+import frc.robot.Constants.ShuffleboardConstants;
 
 public class DriveSubsystem extends SubsystemBase {
   private final double m_maxSpeedLin;
@@ -44,8 +46,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final MAXSwerveModule[] m_modules;
 
+  private GenericEntry m_isXFormation;
   private GenericEntry m_isFieldRelative;
-  private boolean m_isXFormation = false;
 
   private double m_currentMovementMag = 0.0;
   private double m_currentMovementDir = 0.0;
@@ -87,31 +89,27 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    dashboard.addBoolean("IsXFormation", () -> m_isXFormation)
-      .withPosition(4, 2)
-      .withSize(2, 2);
-
-    m_isFieldRelative =
-    dashboard.add("IsFieldRelative", false)
-      .withPosition(2, 2)
-      .withSize(2, 2)
-      .withWidget(BuiltInWidgets.kToggleButton)
-      .getEntry();
-
-    ShuffleboardTabWithMaps.addMap(dashboard, "Pose", this::getPose, List.of(
+    ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.PoseInfo, this::getPose, List.of(
       new Pair<>("X Position", new Pair<>("%.3f m", pose -> pose.getX())),
       new Pair<>("Y Position", new Pair<>("%.3f m", pose -> pose.getY())),
       new Pair<>("Orientation", new Pair<>("%.3f\u00b0", pose -> pose.getRotation().getDegrees()))
-    ))
-      .withPosition(2, 0)
-      .withSize(2, 2);
+    ));
 
-    ShuffleboardTabWithMaps.addMap(dashboard, "Gyro", List.of(
-      new Pair<>("Angular Position", new Pair<>("%.3f\u00b0", this::getRotation_deg)),
-      new Pair<>("Angular Velocity", new Pair<>("%.3f\u00b0/s", this::getRotationRate_deg_s))
-    ))
-      .withPosition(4, 0)
-      .withSize(2, 2);
+    ShuffleboardLayout driveInfo =
+    ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.DriveInfo, List.of(
+      new Pair<>("Gyro Angle", new Pair<>("%.3f\u00b0", this::getRotation_deg)),
+      new Pair<>("Gyro Spin", new Pair<>("%.3f\u00b0/s", this::getRotationRate_deg_s))
+    ));
+
+    m_isXFormation =
+    driveInfo.add("X Fmtion.", false)
+      .withWidget(BuiltInWidgets.kToggleButton)
+      .getEntry();
+
+    m_isFieldRelative =
+    driveInfo.add("Field Rel.", false)
+      .withWidget(BuiltInWidgets.kToggleButton)
+      .getEntry();
   }
 
   public Pose2d getPose() {
@@ -182,7 +180,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void setXFormation(boolean isXFormation) {
-    m_isXFormation = isXFormation;
+    m_isXFormation.setBoolean(isXFormation);
   }
 
   /**
@@ -193,7 +191,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rotInput Turn rate of the robot.
    */
   public void drive(double xInput, double yInput, double rotInput) {
-    if (m_isXFormation) {
+    if (m_isXFormation.getBoolean(false)) {
       setModuleStates(kXFormationStates);
     }
     else {

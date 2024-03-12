@@ -14,12 +14,14 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 
+import frc.robot.Constants.ShuffleboardConstants.PanelMetadata;
+
 public class ShuffleboardTabWithMaps {
   public static <T> ShuffleboardLayout addMap(
-    ShuffleboardTab tab, String name,
+    ShuffleboardTab tab, PanelMetadata metadata,
     String fmt, List<Pair<String, Supplier<T>>> data
   ) {
-    return addMap(tab, name,
+    return addMap(tab, metadata,
       data
         .stream()
         .map(x -> new Pair<>(x.getFirst(), new Pair<>(fmt, x.getSecond())))
@@ -28,10 +30,10 @@ public class ShuffleboardTabWithMaps {
   }
 
   public static <T> ShuffleboardLayout addMap(
-    ShuffleboardTab tab, String name,
+    ShuffleboardTab tab, PanelMetadata metadata,
     List<Pair<String, Pair<String, Supplier<T>>>> data
   ) {
-    ShuffleboardLayout list = tab.getLayout(name, BuiltInLayouts.kList);
+    ShuffleboardLayout list = tab.getLayout(metadata.name, BuiltInLayouts.kList);
 
     data.forEach(x -> {
       list.addString(x.getFirst(),
@@ -41,14 +43,17 @@ public class ShuffleboardTabWithMaps {
         ));
     });
  
-    return list.withProperties(Map.of("Label position", "TOP"));
+    return list
+      .withPosition(metadata.x, metadata.y)
+      .withSize(metadata.w, metadata.h)
+      .withProperties(Map.of("Label position", "TOP"));
   }
 
   public static <T, V> ShuffleboardLayout addMap(
-    ShuffleboardTab tab, String name, Supplier<T> source,
+    ShuffleboardTab tab, PanelMetadata metadata, Supplier<T> source,
     String fmt, List<Pair<String, Function<T, V>>> data
   ) {
-    return addMap(tab, name, source,
+    return addMap(tab, metadata, source,
       data
         .stream()
         .map(x -> new Pair<>(x.getFirst(), new Pair<>(fmt, x.getSecond())))
@@ -57,10 +62,10 @@ public class ShuffleboardTabWithMaps {
   }
 
   public static <T, V> ShuffleboardLayout addMap(
-    ShuffleboardTab tab, String name, Supplier<T> source,
+    ShuffleboardTab tab, PanelMetadata metadata, Supplier<T> source,
     List<Pair<String, Pair<String, Function<T, V>>>> data
   ) {
-    ShuffleboardLayout list = tab.getLayout(name, BuiltInLayouts.kList);
+    ShuffleboardLayout list = tab.getLayout(metadata.name, BuiltInLayouts.kList);
 
     data.forEach(x -> {
       list.addString(x.getFirst(),
@@ -70,18 +75,24 @@ public class ShuffleboardTabWithMaps {
         )));
     });
  
-    return list.withProperties(Map.of("Label position", "TOP"));
+    return list
+      .withPosition(metadata.x, metadata.y)
+      .withSize(metadata.w, metadata.h)
+      .withProperties(Map.of("Label position", "TOP"));
   }
 
   public static ShuffleboardLayout addMap(
-    ShuffleboardTab tab, String name,
+    ShuffleboardTab tab, PanelMetadata metadata,
     List<Pair<String, Supplier<Boolean>>> data, boolean __) {
-    ShuffleboardLayout list = tab.getLayout(name, BuiltInLayouts.kList);
+    ShuffleboardLayout list = tab.getLayout(metadata.name, BuiltInLayouts.kList);
 
     data.forEach(x -> {
       list.addBoolean(x.getFirst(), x.getSecond()::get);
     });
 
-    return list.withProperties(Map.of("Label position", "TOP"));
+    return list
+      .withPosition(metadata.x, metadata.y)
+      .withSize(metadata.w, metadata.h)
+      .withProperties(Map.of("Label position", "TOP"));
   }
 }

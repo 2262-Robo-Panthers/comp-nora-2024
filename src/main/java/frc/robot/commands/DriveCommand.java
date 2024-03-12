@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.util.FunctionalUtil;
 import frc.robot.util.ShuffleboardTabWithMaps;
+import frc.robot.Constants.ShuffleboardConstants;
 
 public class DriveCommand extends Command {
   private final DriveSubsystem m_drive;
@@ -43,13 +44,11 @@ public class DriveCommand extends Command {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, "Drive Controls", "%.3f", List.of(
+    ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.DriveControl, "%.3f", List.of(
       new Pair<>("Strafe X", m_strafeX),
       new Pair<>("Strafe Y", m_strafeY),
       new Pair<>("Rotation", m_rotation)
-    ))
-      .withPosition(0, 0)
-      .withSize(2, 2);
+    ));
   }
 
   @Override

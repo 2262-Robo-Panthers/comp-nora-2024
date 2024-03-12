@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.util.ShuffleboardTabWithMaps;
+import frc.robot.Constants.ShuffleboardConstants;
 
 public class ArmCommand extends Command {
   private final ArmSubsystem m_arm;
@@ -36,12 +37,10 @@ public class ArmCommand extends Command {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, "EEor Controls", "%.3f", List.of(
+    ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.EEorControl, "%.3f", List.of(
       new Pair<>("Intake", m_intake),
       new Pair<>("Launch", m_launch)
-    ))
-      .withPosition(0, 2)
-      .withSize(2, 2);
+    ));
   }
 
   @Override

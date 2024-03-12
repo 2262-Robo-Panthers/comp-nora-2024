@@ -127,7 +127,8 @@ public class RobotContainer {
     m_shoulderSubsystem,
     () ->
       m_endEffectorController.getRightTriggerAxis() -
-      m_endEffectorController.getLeftTriggerAxis()
+      m_endEffectorController.getLeftTriggerAxis(),
+    PivotConstants.kSensitivity
   );
 
   private final Orchestra m_orchestra = new Orchestra();
@@ -136,7 +137,7 @@ public class RobotContainer {
     m_dashboard,
     m_shoulderSubsystem,
     m_orchestra,
-    "SFX", 8, 0,
+    ShuffleboardConstants.SfxInfo,
     "game-sounds/start-auto",
     "game-sounds/start-teleop",
     "game-sounds/match-end"
@@ -146,7 +147,7 @@ public class RobotContainer {
     m_dashboard,
     m_shoulderSubsystem,
     m_orchestra,
-    "Music", 10, 0,
+    ShuffleboardConstants.MusicInfo,
     "music/happy-birthday",
     "music/mary-had-a-little-lamb",
     "music/twinkle-twinkle",

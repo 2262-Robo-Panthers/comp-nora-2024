@@ -22,43 +22,40 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.util.ShuffleboardTabWithMaps;
+import frc.robot.Constants.ShuffleboardConstants.PanelMetadata;
 
 public class ChirpManager {
   private final ShoulderSubsystem m_shoulder;
 
   private final Orchestra m_orchestra;
 
-  private final String m_name;
   private final String[] m_songs;
   private int m_currentSong = 0;
 
   private boolean m_isEnabled = false;
   private boolean m_wasInterrupted = false;
 
-  public ChirpManager(ShuffleboardTab shuffleboardTab, ShoulderSubsystem shoulder, Orchestra orchestra, String name, int x, int y, String... songs) {
+  public ChirpManager(ShuffleboardTab shuffleboardTab, ShoulderSubsystem shoulder, Orchestra orchestra, PanelMetadata metadata, String... songs) {
     m_shoulder = shoulder;
     m_orchestra = orchestra;
-    m_name = name;
     m_songs = songs;
 
-    for (TalonFX controller : m_shoulder.getControllers()) {
+    for (TalonFX controller : shoulder.getControllers()) {
       m_orchestra.addInstrument(controller);
     }
 
     loadCurrentSong();
 
-    populateDashboard(shuffleboardTab, x, y);
+    populateDashboard(shuffleboardTab, metadata);
   }
 
-  private void populateDashboard(ShuffleboardTab dashboard, int x, int y) {
+  private void populateDashboard(ShuffleboardTab dashboard, PanelMetadata metadata) {
     Topic isEnabled =
-    ShuffleboardTabWithMaps.addMap(dashboard, "ChirpManager." + m_name, "%s", List.of(
+    ShuffleboardTabWithMaps.addMap(dashboard, metadata, "%s", List.of(
       new Pair<>("State", () -> m_orchestra.isPlaying() ? "playing" : "paused"),
-      new Pair<>("CurrentSong", () -> m_songs[m_currentSong])
+      new Pair<>("Loaded", () -> "..." + String.format("%>64s", m_songs[m_currentSong]).substring(56))
     ))
-      .withPosition(x, y)
-      .withSize(2, 2)
-      .add("IsEnabled", m_isEnabled)
+      .add("Enabled?", m_isEnabled)
       .withWidget(BuiltInWidgets.kToggleSwitch)
       .getEntry()
       .getTopic();

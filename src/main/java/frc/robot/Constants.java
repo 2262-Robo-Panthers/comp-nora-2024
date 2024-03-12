@@ -16,6 +16,33 @@ public final class Constants {
     }
   }
 
+  public static class ShuffleboardConstants {
+    public static class PanelMetadata {
+      public final String name;
+      public final int x;
+      public final int y;
+      public final int w;
+      public final int h;
+
+      public PanelMetadata(String name, int x, int y, int w, int h) {
+        this.name = name;
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+      }
+    }
+
+    public static PanelMetadata DriveControl = new PanelMetadata("Drive Ctrl",  0, 0, 1, 2);
+    public static PanelMetadata EEorControl  = new PanelMetadata("EEor Ctrl",   0, 2, 1, 2);
+    public static PanelMetadata PoseInfo     = new PanelMetadata("Pose",        1, 0, 2, 4);
+    public static PanelMetadata DriveInfo    = new PanelMetadata("Drive",       3, 0, 1, 4);
+    public static PanelMetadata ShoulderInfo = new PanelMetadata("Shoulder",    4, 0, 1, 4);
+    public static PanelMetadata SfxInfo      = new PanelMetadata("SFX",         5, 0, 1, 2);
+    public static PanelMetadata MusicInfo    = new PanelMetadata("Music",       5, 2, 1, 2);
+    public static PanelMetadata AutoChooser  = new PanelMetadata("Select Auto", 0, 4, 6, 1);
+  }
+
   public static class AutoConstants {
     // Values acquired by testing
     public static final double kSpeakerFrontAim = 0.121;
@@ -116,8 +143,8 @@ public final class Constants {
     public static final double kHyperextension = 0.1; // 10% of total range
     public static final double kSensitivity = 0.01;
 
-    public static final double kP = 0.7;
-    public static final double kI = 0.5;
+    public static final double kP = 0.8;
+    public static final double kI = 0.6;
     public static final double kD = 0.0;
 
     public static class CAN {

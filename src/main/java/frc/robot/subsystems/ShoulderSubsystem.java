@@ -20,8 +20,8 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import frc.robot.Constants.PivotConstants;
 import frc.robot.util.ShuffleboardTabWithMaps;
+import frc.robot.Constants.ShuffleboardConstants;
 
 public class ShoulderSubsystem extends SubsystemBase {
   private final double m_totalRange;
@@ -64,6 +64,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     for (TalonFX controller : talons) {
       controller.setInverted(isInverted);
 
+      // TODO check if both talons operate identically
       if (controller != m_master) {
         controller.setControl(follower);
       }
@@ -101,7 +102,7 @@ public class ShoulderSubsystem extends SubsystemBase {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, "Pivot", List.of(
+    ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.ShoulderInfo, List.of(
       new Pair<>("Hit Lower", m_limitSwitchLower::get),
       new Pair<>("Hit Upper", m_limitSwitchUpper::get)
     ), false)
@@ -115,7 +116,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   public void movePivotPosition(double positionDelta) {
     setPivotPosition(MathUtil.clamp(
-      m_positionNow + positionDelta * PivotConstants.kSensitivity,
+      m_positionNow + positionDelta,
       0.0 - m_hyperextension,
       1.0 + m_hyperextension
     ));
