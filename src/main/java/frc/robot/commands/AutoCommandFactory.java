@@ -102,6 +102,8 @@ public class AutoCommandFactory {
 
       new HomeCommand(shoulder, ShoulderSubsystem.Extremum.kUpper))
 
+      .andThen(new InstantCommand(() -> System.out.println("WPO}FJEUWOP}")))
+
       .andThen(
 
       new InstantCommand(() -> shoulder.setPivotPosition(AutoConstants.kSpeakerFrontAim), shoulder)
