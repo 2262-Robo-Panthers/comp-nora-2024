@@ -22,8 +22,8 @@ import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import static edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis.kZ;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.MAXSwerve.SwerveUtils;
@@ -91,9 +91,10 @@ public class DriveSubsystem extends SubsystemBase {
   private void populateDashboard(ShuffleboardTab dashboard) {
     ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.PoseInfo, this::getPose, List.of(
       new Pair<>("X Position", new Pair<>("%.3f m", pose -> pose.getX())),
-      new Pair<>("Y Position", new Pair<>("%.3f m", pose -> pose.getY())),
-      new Pair<>("Orientation", new Pair<>("%.3f\u00b0", pose -> pose.getRotation().getDegrees()))
-    ));
+      new Pair<>("Y Position", new Pair<>("%.3f m", pose -> pose.getY()))
+    ))
+      .addDouble("Orientation", () -> 0.0 - getPose().getRotation().getDegrees()) // Negative because Gyro widget is CW+
+      .withWidget(BuiltInWidgets.kGyro);
 
     ShuffleboardLayout driveInfo =
     ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.DriveInfo, List.of(

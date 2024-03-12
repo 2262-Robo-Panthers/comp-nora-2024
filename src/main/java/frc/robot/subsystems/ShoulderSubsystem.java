@@ -102,16 +102,16 @@ public class ShoulderSubsystem extends SubsystemBase {
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.ShoulderInfo, List.of(
-      new Pair<>("Hit Lower", m_limitSwitchLower::get),
-      new Pair<>("Hit Upper", m_limitSwitchUpper::get)
-    ), false)
-      .withPosition(6, 0)
-      .withSize(2, 4)
-      .addDouble("Position Requested", () -> m_positionNow * m_totalRange).getParent()
-      .addDouble("Position Reported", () -> m_master.getPosition().getValue() - m_positionZero).getParent()
-      .addDouble("Position Zero", () -> m_positionZero).getParent()
-      .addDouble("Motor Temperature", this::getHighestMotorTemperature);
+    ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.ShoulderInfo, "%.3f", List.of(
+      new Pair<>("Requested", () -> m_positionNow * m_totalRange),
+      new Pair<>("Reported", () -> m_master.getPosition().getValue() - m_positionZero),
+      new Pair<>("Zero", () -> m_positionZero)
+    ))
+      .addDouble("Mtr 0 Temp", m_talons[0].getDeviceTemp().asSupplier()::get).getParent()
+      .addDouble("Mtr 1 Temp", m_talons[1].getDeviceTemp().asSupplier()::get).getParent()
+      .addStringArray("Too Far?", () -> new String[]
+        { isAtLimitLower() ? "LWR" : "",
+          isAtLimitUpper() ? "UPR" : "" });
   }
 
   public void movePivotPosition(double positionDelta) {
@@ -151,13 +151,6 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   public boolean isAtLimitUpper() {
     return !m_limitSwitchUpper.get();
-  }
-
-  public double getHighestMotorTemperature() {
-    return Math.max(
-      m_talons[0].getDeviceTemp().getValue(),
-      m_talons[1].getDeviceTemp().getValue()
-    );
   }
 
   public TalonFX[] getControllers() {
