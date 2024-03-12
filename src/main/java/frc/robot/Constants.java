@@ -200,7 +200,7 @@ public final class Constants {
     // the steering motor in the MAXSwerve Module.
     public static final boolean kTurnEncoderInverted = true;
 
-    ///////////////////////////////////////////////////////
+    // TODO continue refactoring constants below:
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kWheelDiameter_m = 0.0762;

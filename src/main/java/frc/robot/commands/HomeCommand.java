@@ -39,7 +39,8 @@ public class HomeCommand extends Command {
       System.out.println("HomeCommand finished backing off.");
     }
 
-    m_shoulder.movePivotPosition(0.7 * (m_preferredDirection == Extremum.kLower ^ m_shouldBackOff ? -1 : 1));
+    // TODO add constant for home speed
+    m_shoulder.movePivotPosition(0.01 * (m_preferredDirection == Extremum.kLower ^ m_shouldBackOff ? -1 : 1));
   }
 
   @Override

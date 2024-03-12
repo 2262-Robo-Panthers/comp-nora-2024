@@ -64,7 +64,6 @@ public class ShoulderSubsystem extends SubsystemBase {
     for (TalonFX controller : talons) {
       controller.setInverted(isInverted);
 
-      // TODO check if both talons operate identically
       if (controller != m_master) {
         controller.setControl(follower);
       }
@@ -109,9 +108,9 @@ public class ShoulderSubsystem extends SubsystemBase {
     ))
       .addDouble("Mtr 0 Temp", m_talons[0].getDeviceTemp().asSupplier()::get).getParent()
       .addDouble("Mtr 1 Temp", m_talons[1].getDeviceTemp().asSupplier()::get).getParent()
-      .addStringArray("Too Far?", () -> new String[]
-        { isAtLimitLower() ? "LWR" : "",
-          isAtLimitUpper() ? "UPR" : "" });
+      .addString("Too Far?", () -> String.join(" ",
+        isAtLimitLower() ? "LWR" : "",
+        isAtLimitUpper() ? "UPR" : ""));
   }
 
   public void movePivotPosition(double positionDelta) {

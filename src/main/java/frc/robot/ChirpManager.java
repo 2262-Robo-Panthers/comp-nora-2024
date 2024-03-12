@@ -53,10 +53,10 @@ public class ChirpManager {
     Topic isEnabled =
     ShuffleboardTabWithMaps.addMap(dashboard, metadata, "%s", List.of(
       new Pair<>("State", () -> m_orchestra.isPlaying() ? "playing" : "paused"),
-      new Pair<>("Loaded", () -> "..." + String.format("%>64s", m_songs[m_currentSong]).substring(56))
+      new Pair<>("Loaded", () -> m_songs[m_currentSong].split("/")[1])
     ))
       .add("Enabled?", m_isEnabled)
-      .withWidget(BuiltInWidgets.kToggleSwitch)
+      .withWidget(BuiltInWidgets.kToggleButton)
       .getEntry()
       .getTopic();
 
