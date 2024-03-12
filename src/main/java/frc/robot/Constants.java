@@ -17,14 +17,14 @@ public final class Constants {
   }
 
   public static class ShuffleboardConstants {
-    public static class PanelMetadata {
+    public static class CardMetadata {
       public final String name;
       public final int x;
       public final int y;
       public final int w;
       public final int h;
 
-      public PanelMetadata(String name, int x, int y, int w, int h) {
+      public CardMetadata(String name, int x, int y, int w, int h) {
         this.name = name;
         this.x = x;
         this.y = y;
@@ -33,19 +33,19 @@ public final class Constants {
       }
     }
 
-    public static PanelMetadata DriveControl = new PanelMetadata("Drive Ctrl",  0, 0, 1, 2);
-    public static PanelMetadata EEorControl  = new PanelMetadata("EEor Ctrl",   0, 2, 1, 2);
-    public static PanelMetadata PoseInfo     = new PanelMetadata("Pose",        1, 0, 2, 4);
-    public static PanelMetadata DriveInfo    = new PanelMetadata("Drive",       3, 0, 1, 4);
-    public static PanelMetadata ShoulderInfo = new PanelMetadata("Shoulder",    4, 0, 1, 4);
-    public static PanelMetadata SfxInfo      = new PanelMetadata("SFX",         5, 0, 1, 2);
-    public static PanelMetadata MusicInfo    = new PanelMetadata("Music",       5, 2, 1, 2);
-    public static PanelMetadata AutoChooser  = new PanelMetadata("Select Auto", 0, 4, 6, 1);
+    public static CardMetadata DriveControl = new CardMetadata("Drive Ctrl",  0, 0, 1, 2);
+    public static CardMetadata EEorControl  = new CardMetadata("EEor Ctrl",   0, 2, 1, 2);
+    public static CardMetadata PoseInfo     = new CardMetadata("Pose",        1, 0, 2, 4);
+    public static CardMetadata DriveInfo    = new CardMetadata("Drive",       3, 0, 1, 4);
+    public static CardMetadata ShoulderInfo = new CardMetadata("Shoulder",    4, 0, 1, 4);
+    public static CardMetadata SfxInfo      = new CardMetadata("SFX",         5, 0, 1, 2);
+    public static CardMetadata MusicInfo    = new CardMetadata("Music",       5, 2, 1, 2);
+    public static CardMetadata AutoChooser  = new CardMetadata("Select Auto", 0, 4, 6, 1);
   }
 
   public static class AutoConstants {
     // Values acquired by testing
-    public static final double kSpeakerFrontAim = 0.121;
+    public static final double kSpeakerFrontAim = 0.075;
     public static final double kSpeakerSideAim = 0.164;
 
     public static final double kIntakeDistance = Units.inchesToMeters(5.0);
@@ -65,8 +65,7 @@ public final class Constants {
 
     public static final double kDriveNoteToLeave
       = kDistanceSpeakerToLeave
-      - kDriveSpeakerToNote
-      + 0.5; // Extra distance to be safe
+      - kDriveSpeakerToNote;
   }
 
   public static class DriveConstants {
@@ -139,7 +138,7 @@ public final class Constants {
 
   public static class PivotConstants {
     public static final boolean kIsInverted = true;
-    public static final double kRange = 14.0;
+    public static final double kRange = 15.0;
     public static final double kHyperextension = 0.1; // 10% of total range
     public static final double kSensitivity = 0.01;
 

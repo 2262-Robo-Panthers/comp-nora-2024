@@ -31,6 +31,8 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
 import frc.robot.Constants.*;
+import frc.robot.Constants.ShuffleboardConstants.CardMetadata;
+
 import static frc.robot.Constants.DriveConstants.ModuleId.*;
 
 public class RobotContainer {
@@ -143,7 +145,7 @@ public class RobotContainer {
     "game-sounds/match-end"
   );
 
-  private final ChirpManager m_chirpManager = new ChirpManager(
+  private final ChirpManager m_musicManager = new ChirpManager(
     m_dashboard,
     m_shoulderSubsystem,
     m_orchestra,
@@ -183,11 +185,13 @@ public class RobotContainer {
   }
 
   private void populateDashboard() {
+    CardMetadata metadata = ShuffleboardConstants.AutoChooser;
+
     m_dashboard
-      .add("Auto Chooser", m_autoChooser)
+      .add(metadata.name, m_autoChooser)
       .withWidget(BuiltInWidgets.kComboBoxChooser)
-      .withPosition(8, 2)
-      .withSize(4, 2);
+      .withPosition(metadata.x, metadata.y)
+      .withSize(metadata.w, metadata.h);
   }
 
   private void configureBindings() {
@@ -202,34 +206,55 @@ public class RobotContainer {
       .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseTranslationY(0.0), m_driveSubsystem));
     m_driverController.a()
       .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(0.0)), m_driveSubsystem));
+    m_driverController.b()
+      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(Math.PI)), m_driveSubsystem));
+
+    // TODO test chirps
+    m_driverController.leftBumper()
+      .onTrue(m_sfxManager.getSongSelectCommand(i -> i + 1));
+    m_driverController.back()
+      .onTrue(m_sfxManager.getPlayPauseCommand());
+    m_driverController.rightBumper()
+      .onTrue(m_musicManager.getSongSelectCommand(i -> i + 1));
+    m_driverController.start()
+      .onTrue(m_musicManager.getPlayPauseCommand());
 
     m_endEffectorController.povUp()
       .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kUpper));
     m_endEffectorController.povDown()
       .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kLower));
-    m_endEffectorController.leftBumper()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(0.0), m_shoulderSubsystem));
-    m_endEffectorController.rightBumper()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(1.0), m_shoulderSubsystem));
     m_endEffectorController.povLeft()
       .onTrue(new InstantCommand(m_shoulderSubsystem::neutralizeMotors, m_shoulderSubsystem)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
     m_endEffectorController.povRight()
       .onTrue(new InstantCommand(m_shoulderSubsystem::deneutralizeMotors, m_shoulderSubsystem));
+    m_endEffectorController.leftBumper()
+      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(0.0), m_shoulderSubsystem));
+    m_endEffectorController.rightBumper()
+      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(1.0), m_shoulderSubsystem));
 
-    m_endEffectorController.start()
-      .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));
-    m_endEffectorController.back()
-      .onTrue(m_chirpManager.getSongSelectCommand(i -> i - 1));
-    m_endEffectorController.y()
-      .onTrue(m_chirpManager.getPlayPauseCommand());
-
-    m_endEffectorController.x()
-      .onTrue(m_sfxManager.getSongPlayCommand(__ -> 0));
     m_endEffectorController.a()
-      .onTrue(m_sfxManager.getSongPlayCommand(__ -> 1));
+      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.setPivotPosition(0.0), m_shoulderSubsystem));
     m_endEffectorController.b()
-      .onTrue(m_sfxManager.getSongPlayCommand(__ -> 2));
+      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.setPivotPosition(AutoConstants.kSpeakerSideAim), m_shoulderSubsystem));
+    m_endEffectorController.x()
+      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.setPivotPosition(AutoConstants.kSpeakerFrontAim), m_shoulderSubsystem));
+    m_endEffectorController.y()
+      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.setPivotPosition(1.0), m_shoulderSubsystem));
+
+    // m_endEffectorController.back()
+    //   .onTrue(m_chirpManager.getSongSelectCommand(i -> i - 1));
+    // m_endEffectorController.start()
+    //   .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));
+    // m_endEffectorController.y()
+    //   .onTrue(m_chirpManager.getPlayPauseCommand());
+
+    // m_endEffectorController.x()
+    //   .onTrue(m_sfxManager.getSongPlayCommand(__ -> 0));
+    // m_endEffectorController.a()
+    //   .onTrue(m_sfxManager.getSongPlayCommand(__ -> 1));
+    // m_endEffectorController.b()
+    //   .onTrue(m_sfxManager.getSongPlayCommand(__ -> 2));
   }
 
   public Command getAutonomousCommand() {

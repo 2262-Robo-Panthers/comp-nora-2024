@@ -14,11 +14,11 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 
-import frc.robot.Constants.ShuffleboardConstants.PanelMetadata;
+import frc.robot.Constants.ShuffleboardConstants.CardMetadata;
 
 public class ShuffleboardTabWithMaps {
   public static <T> ShuffleboardLayout addMap(
-    ShuffleboardTab tab, PanelMetadata metadata,
+    ShuffleboardTab tab, CardMetadata metadata,
     String fmt, List<Pair<String, Supplier<T>>> data
   ) {
     return addMap(tab, metadata,
@@ -30,7 +30,7 @@ public class ShuffleboardTabWithMaps {
   }
 
   public static <T> ShuffleboardLayout addMap(
-    ShuffleboardTab tab, PanelMetadata metadata,
+    ShuffleboardTab tab, CardMetadata metadata,
     List<Pair<String, Pair<String, Supplier<T>>>> data
   ) {
     ShuffleboardLayout list = tab.getLayout(metadata.name, BuiltInLayouts.kList);
@@ -50,7 +50,7 @@ public class ShuffleboardTabWithMaps {
   }
 
   public static <T, V> ShuffleboardLayout addMap(
-    ShuffleboardTab tab, PanelMetadata metadata, Supplier<T> source,
+    ShuffleboardTab tab, CardMetadata metadata, Supplier<T> source,
     String fmt, List<Pair<String, Function<T, V>>> data
   ) {
     return addMap(tab, metadata, source,
@@ -62,7 +62,7 @@ public class ShuffleboardTabWithMaps {
   }
 
   public static <T, V> ShuffleboardLayout addMap(
-    ShuffleboardTab tab, PanelMetadata metadata, Supplier<T> source,
+    ShuffleboardTab tab, CardMetadata metadata, Supplier<T> source,
     List<Pair<String, Pair<String, Function<T, V>>>> data
   ) {
     ShuffleboardLayout list = tab.getLayout(metadata.name, BuiltInLayouts.kList);
@@ -82,7 +82,7 @@ public class ShuffleboardTabWithMaps {
   }
 
   public static ShuffleboardLayout addMap(
-    ShuffleboardTab tab, PanelMetadata metadata,
+    ShuffleboardTab tab, CardMetadata metadata,
     List<Pair<String, Supplier<Boolean>>> data, boolean __) {
     ShuffleboardLayout list = tab.getLayout(metadata.name, BuiltInLayouts.kList);
 

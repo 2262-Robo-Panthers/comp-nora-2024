@@ -83,6 +83,7 @@ public class AutoCommandFactory {
 
   public static Command Leave(DriveSubsystem drive) {
     return
+      // TODO test if auto homes rotation correctly, and if it can be done manually without double-A
       new InstantCommand(drive::discardGyroDrift, drive)
 
       .andThen(
@@ -105,13 +106,13 @@ public class AutoCommandFactory {
 
       new InstantCommand(() -> shoulder.setPivotPosition(AutoConstants.kSpeakerFrontAim), shoulder)
       .alongWith(
-      new WaitCommand(1.5)))
+      new WaitCommand(2.0)))
 
       .andThen(
 
       new InstantCommand(() -> arm.setLaunchSpeed(1.0), arm)
       .alongWith(
-      new WaitCommand(1.5)))
+      new WaitCommand(2.0)))
 
       .andThen(
 
@@ -125,7 +126,11 @@ public class AutoCommandFactory {
       .alongWith(
       new InstantCommand(() ->
         { arm.setLaunchSpeed(0.0);
-          arm.setIntakeSpeed(0.0); }, arm)));
+          arm.setIntakeSpeed(0.0); }, arm))
+      .alongWith(
+      movementHelper(drive, List.of(
+        new Pose2d(0.0, 0.0, new Rotation2d(0.0)),
+        new Pose2d(AutoConstants.kDistanceSpeakerToLeave + 0.5, 0.0, new Rotation2d(0.0))))));
   }
 
   // public static Command SpeakerLoadLeave(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {

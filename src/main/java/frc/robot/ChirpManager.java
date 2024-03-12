@@ -22,7 +22,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.util.ShuffleboardTabWithMaps;
-import frc.robot.Constants.ShuffleboardConstants.PanelMetadata;
+import frc.robot.Constants.ShuffleboardConstants.CardMetadata;
 
 public class ChirpManager {
   private final ShoulderSubsystem m_shoulder;
@@ -35,7 +35,7 @@ public class ChirpManager {
   private boolean m_isEnabled = false;
   private boolean m_wasInterrupted = false;
 
-  public ChirpManager(ShuffleboardTab shuffleboardTab, ShoulderSubsystem shoulder, Orchestra orchestra, PanelMetadata metadata, String... songs) {
+  public ChirpManager(ShuffleboardTab shuffleboardTab, ShoulderSubsystem shoulder, Orchestra orchestra, CardMetadata metadata, String... songs) {
     m_shoulder = shoulder;
     m_orchestra = orchestra;
     m_songs = songs;
@@ -49,7 +49,7 @@ public class ChirpManager {
     populateDashboard(shuffleboardTab, metadata);
   }
 
-  private void populateDashboard(ShuffleboardTab dashboard, PanelMetadata metadata) {
+  private void populateDashboard(ShuffleboardTab dashboard, CardMetadata metadata) {
     Topic isEnabled =
     ShuffleboardTabWithMaps.addMap(dashboard, metadata, "%s", List.of(
       new Pair<>("State", () -> m_orchestra.isPlaying() ? "playing" : "paused"),
