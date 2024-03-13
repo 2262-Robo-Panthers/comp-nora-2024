@@ -110,13 +110,13 @@ public class AutoCommandFactory {
 
       .andThen(
 
-      new InstantCommand(() -> arm.setLaunchSpeed(-1.0), arm)
+      new InstantCommand(() -> arm.setLaunchSpeed(1.0), arm)
       .alongWith(
       new WaitCommand(2.0)))
 
       .andThen(
 
-      new InstantCommand(() -> arm.setIntakeSpeed(-1.0), arm)
+      new InstantCommand(() -> arm.setIntakeSpeed(1.0), arm)
       .alongWith(
       new WaitCommand(2.0)))
 
@@ -147,13 +147,13 @@ public class AutoCommandFactory {
 
       .andThen(
 
-      new InstantCommand(() -> arm.setLaunchSpeed(-1.0), arm)
+      new InstantCommand(() -> arm.setLaunchSpeed(1.0), arm)
       .alongWith(
       new WaitCommand(1.5)))
 
       .andThen(
 
-      new InstantCommand(() -> arm.setIntakeSpeed(-1.0), arm)
+      new InstantCommand(() -> arm.setIntakeSpeed(1.0), arm)
       .alongWith(
       new WaitCommand(1.5)))
 
@@ -161,7 +161,7 @@ public class AutoCommandFactory {
 
       new InstantCommand(() -> arm.setLaunchSpeed(-0.01), arm)
       .alongWith(
-      new InstantCommand(() -> shoulder.setPivotPosition(-0.07), shoulder)))
+      new InstantCommand(() -> shoulder.setPivotPosition(-0.06), shoulder)))
       .alongWith(
       new WaitCommand(1.0))
 

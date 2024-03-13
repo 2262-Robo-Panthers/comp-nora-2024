@@ -107,7 +107,8 @@ public class RobotContainer {
     m_dashboard,
     m_armSubsystem,
     m_endEffectorController::getRightY,
-    m_endEffectorController::getLeftY
+    m_endEffectorController::getLeftY,
+    OIConstants.kDeadband
   );
 
   public final ShoulderSubsystem m_shoulderSubsystem = new ShoulderSubsystem(

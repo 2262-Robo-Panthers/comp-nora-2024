@@ -6,12 +6,15 @@ package frc.robot.commands;
 
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.util.FunctionalUtil;
 import frc.robot.util.ShuffleboardTabWithMaps;
 import frc.robot.Constants.ShuffleboardConstants;
 
@@ -24,12 +27,14 @@ public class ArmCommand extends Command {
   public ArmCommand(
     ShuffleboardTab shuffleboardTab,
     ArmSubsystem arm,
-    Supplier<Double> intake, Supplier<Double> launch
+    Supplier<Double> intake, Supplier<Double> launch,
+    double deadband
   ) {
     m_arm = arm;
 
-    m_intake = intake;
-    m_launch = launch;
+    UnaryOperator<Double> deadbandify = i -> 0 - MathUtil.applyDeadband(i, deadband);
+    m_intake = FunctionalUtil.supplyThenOperate(intake, deadbandify);
+    m_launch = FunctionalUtil.supplyThenOperate(launch, deadbandify);
 
     populateDashboard(shuffleboardTab);
 
