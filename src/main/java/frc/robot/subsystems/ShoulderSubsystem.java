@@ -8,11 +8,13 @@ import java.util.List;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.util.WPIUtilJNI;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.controls.NeutralOut;
@@ -26,9 +28,12 @@ import frc.robot.Constants.ShuffleboardConstants;
 public class ShoulderSubsystem extends SubsystemBase {
   private final double m_totalRange;
   private final double m_hyperextension;
-  private final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
 
-  private double m_positionNow;
+  private final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
+  private final TrapezoidProfile m_profile;
+  private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(1.0, 0.0);
+  private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State(1.0, 0.0);
+
   private double m_positionZero;
   private boolean m_isNeutralized = false;
 
@@ -40,6 +45,8 @@ public class ShoulderSubsystem extends SubsystemBase {
   private TalonFX[] m_talons;
   private TalonFX m_master;
 
+  private double m_prevTime = WPIUtilJNI.now() * 1e-6;
+
   public enum Extremum {
     kLower,
     kUpper;
@@ -50,6 +57,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     boolean isInverted,
     double totalRange, double hyperextension,
     double p, double i, double d,
+    double maxSpeed, double maxAccel,
     DigitalInput limitSwitchLower, DigitalInput limitSwitchUpper,
     TalonFX... talons
   ) {
@@ -71,6 +79,8 @@ public class ShoulderSubsystem extends SubsystemBase {
       }
     }
 
+    m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxSpeed, maxAccel));
+
     setupPid(p, i, d);
     setupLimitChecks();
     resetPosition(1.0);
@@ -91,7 +101,8 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   private void populateDashboard(ShuffleboardTab dashboard) {
     ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.ShoulderInfo, "%.3f", List.of(
-      new Pair<>("Requested", () -> m_positionNow * m_totalRange),
+      new Pair<>("Input", () -> m_goal.position * m_totalRange),
+      new Pair<>("Request", () -> m_setpoint.position * m_totalRange),
       new Pair<>("Reported", () -> m_master.getPosition().getValue() - m_positionZero),
       new Pair<>("Zero", () -> m_positionZero)
     ))
@@ -102,8 +113,19 @@ public class ShoulderSubsystem extends SubsystemBase {
         isAtLimitUpper() ? "UPR" : ""));
   }
 
+  @Override
+  public void periodic() {
+    if (!m_isNeutralized) {
+      double currentTime = WPIUtilJNI.now() * 1e-6;
+      double elapsedTime = currentTime - m_prevTime;
+      m_prevTime = currentTime;
+
+      m_setpoint = m_profile.calculate(elapsedTime, m_setpoint, m_goal);
+      m_master.setControl(m_request.withPosition(m_positionZero + m_setpoint.position * m_totalRange));
+    }
+  }
+
   private void setupLimitChecks() {
-    // TODO better functional code
     new Trigger(() -> m_limitSwitchLower.get() && m_shouldCheckLimits)
       .onFalse(new InstantCommand(() -> {
         resetPosition(0.0);
@@ -125,19 +147,15 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   public void movePivotPosition(double positionDelta) {
     setPivotPosition(MathUtil.clamp(
-      m_positionNow + positionDelta,
+      m_goal.position + positionDelta,
       0.0 - m_hyperextension,
       1.0 + m_hyperextension
     ));
   }
 
   public void setPivotPosition(double position) {
-    m_positionNow = position;
-
-    if (m_isNeutralized)
-      return;
-
-    m_master.setControl(m_request.withPosition(m_positionZero + m_positionNow * m_totalRange));
+    m_goal.position = position;
+    m_goal.velocity = 0.0;
   }
 
   public void resetPosition(double position) {

@@ -145,6 +145,8 @@ public final class Constants {
     public static final double kP = 0.8;
     public static final double kI = 0.6;
     public static final double kD = 0.0;
+    public static final double kMaxSpeed = 0.2;
+    public static final double kMaxAccel = 0.2;
 
     public static class CAN {
       public static final int kMotorPortA = 1;

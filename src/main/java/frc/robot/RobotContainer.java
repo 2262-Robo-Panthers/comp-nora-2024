@@ -119,6 +119,8 @@ public class RobotContainer {
     PivotConstants.kP,
     PivotConstants.kI,
     PivotConstants.kD,
+    PivotConstants.kMaxSpeed,
+    PivotConstants.kMaxAccel,
     new DigitalInput(PivotConstants.DIO.kLimitSwitchLower),
     new DigitalInput(PivotConstants.DIO.kLimitSwitchUpper),
     new TalonFX(PivotConstants.CAN.kMotorPortA),
