@@ -81,9 +81,9 @@ public class AutoCommandFactory {
 
   /********************************/
 
+  // TODO change values
   public static Command Leave(DriveSubsystem drive) {
     return
-      // TODO test if auto homes rotation correctly, and if it can be done manually without double-A
       new InstantCommand(drive::discardGyroDrift, drive)
 
       .andThen(
@@ -100,9 +100,7 @@ public class AutoCommandFactory {
 
       .andThen(
 
-      new HomeCommand(shoulder, ShoulderSubsystem.Extremum.kUpper))
-
-      .andThen(new InstantCommand(() -> System.out.println("WPO}FJEUWOP}")))
+      new HomeCommand(shoulder, ShoulderSubsystem.Extremum.kLower))
 
       .andThen(
 
@@ -112,75 +110,96 @@ public class AutoCommandFactory {
 
       .andThen(
 
-      new InstantCommand(() -> arm.setLaunchSpeed(1.0), arm)
+      new InstantCommand(() -> arm.setLaunchSpeed(-1.0), arm)
       .alongWith(
       new WaitCommand(2.0)))
 
       .andThen(
 
-      new InstantCommand(() -> arm.setIntakeSpeed(1.0), arm)
+      new InstantCommand(() -> arm.setIntakeSpeed(-1.0), arm)
       .alongWith(
       new WaitCommand(2.0)))
 
       .andThen(
 
-      new InstantCommand(() -> shoulder.setPivotPosition(1.0), shoulder)
-      .alongWith(
       new InstantCommand(() ->
         { arm.setLaunchSpeed(0.0);
-          arm.setIntakeSpeed(0.0); }, arm))
+          arm.setIntakeSpeed(0.0); }, arm)
       .alongWith(
       movementHelper(drive, List.of(
         new Pose2d(0.0, 0.0, new Rotation2d(0.0)),
         new Pose2d(AutoConstants.kDistanceSpeakerToLeave + 0.5, 0.0, new Rotation2d(0.0))))));
   }
 
-  // public static Command SpeakerLoadLeave(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
-  //   return
-  //     new InstantCommand(() -> drive.usePoseRotation(new Rotation2d(0.0)), drive)
+  public static Command SpeakerLoadLeave(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
+    return
+      new InstantCommand(drive::discardGyroDrift, drive)
 
-  //     .andThen(
+      .andThen(
 
-  //     new HomeCommand(shoulder, ShoulderSubsystem.Extremum.kUpper))
+      new HomeCommand(shoulder, ShoulderSubsystem.Extremum.kLower))
 
-  //     .andThen(
+      .andThen(
 
-  //     new InstantCommand(() -> shoulder.setPivotPosition(0.5))
-  //     .alongWith(
-  //     new WaitCommand(2.0)))
+      new InstantCommand(() -> shoulder.setPivotPosition(AutoConstants.kSpeakerFrontAim), shoulder)
+      .alongWith(
+      new WaitCommand(1.5)))
 
-  //     .andThen(
+      .andThen(
 
-  //     new InstantCommand(() -> arm.setLaunchSpeed(1.0), arm)
-  //     .alongWith(
-  //     new WaitCommand(2.0)))
+      new InstantCommand(() -> arm.setLaunchSpeed(-1.0), arm)
+      .alongWith(
+      new WaitCommand(1.5)))
 
-  //     .andThen(
+      .andThen(
 
-  //     new InstantCommand(() -> arm.setIntakeSpeed(1.0), arm)
-  //     .alongWith(
-  //     new WaitCommand(2.0)))
+      new InstantCommand(() -> arm.setIntakeSpeed(-1.0), arm)
+      .alongWith(
+      new WaitCommand(1.5)))
 
-  //     .andThen(
+      .andThen(
 
-  //     movementHelper(drive, List.of(
-  //       new Pose2d(0.0, 0.0, new Rotation2d(0.0)),
-  //       new Pose2d(0.5, 0.0, new Rotation2d(0.0)))))
+      new InstantCommand(() -> arm.setLaunchSpeed(-0.01), arm)
+      .alongWith(
+      new InstantCommand(() -> shoulder.setPivotPosition(-0.07), shoulder)))
+      .alongWith(
+      new WaitCommand(1.0))
 
-  //     .andThen(
+      .andThen(
 
-  //     loadFromGround(drive, arm, shoulder))
+      movementHelper(drive, List.of(
+        new Pose2d(0.0, 0.0, new Rotation2d(0.0)),
+        new Pose2d(AutoConstants.kDriveSpeakerToNote
+          + AutoConstants.kDriveNoteToLeave + 0.5, 0.0, new Rotation2d(0.0))))
+      .alongWith(new WaitCommand(1.0)))
 
-  //     .andThen(
+      .andThen(
 
-  //     new InstantCommand(() -> shoulder.setPivotPosition(1.0), shoulder)
-  //     .alongWith(
-  //     new InstantCommand(() ->
-  //       { arm.setLaunchSpeed(0.0);
-  //         arm.setIntakeSpeed(0.0); }, arm))
-  //     .alongWith(
-  //     movementHelper(drive, List.of(
-  //       new Pose2d(0.5, 0.0, new Rotation2d(0.0)),
-  //       new Pose2d(2.0, 0.0, new Rotation2d(0.0))))));
-  // }
+      new InstantCommand(() -> shoulder.setPivotPosition(AutoConstants.kSpeakerFrontAim), shoulder)
+      .alongWith(
+      new InstantCommand(() -> arm.setIntakeSpeed(0.0), arm))
+      .alongWith(
+      movementHelper(drive, List.of(
+        new Pose2d(AutoConstants.kDriveSpeakerToNote
+          + AutoConstants.kDriveNoteToLeave + 0.5, 0.0, new Rotation2d(0.0)),
+        new Pose2d(0.0, 0.0, new Rotation2d(0.0))))))
+
+      .andThen(
+
+      new InstantCommand(() -> arm.setLaunchSpeed(1.0), arm)
+      .alongWith(
+      new WaitCommand(1.5)))
+
+      .andThen(
+
+      new InstantCommand(() -> arm.setIntakeSpeed(1.0), arm)
+      .alongWith(
+      new WaitCommand(1.5)))
+
+      .andThen(
+
+      new InstantCommand(() ->
+        { arm.setLaunchSpeed(0.0);
+          arm.setIntakeSpeed(0.0); }, arm));
+  }
 }

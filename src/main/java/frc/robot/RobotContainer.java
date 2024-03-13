@@ -42,7 +42,7 @@ public class RobotContainer {
     OIConstants.USB.kDriverControllerPort
   );
 
-  private final DriveSubsystem m_driveSubsystem = new DriveSubsystem(
+  public final DriveSubsystem m_driveSubsystem = new DriveSubsystem(
     m_dashboard,
     DriveConstants.kMaxSpeedLin_m_s,
     DriveConstants.kMaxSpeedAng_rad_s,
@@ -86,7 +86,7 @@ public class RobotContainer {
     OIConstants.USB.kEndEffectorControllerPort
   );
 
-  private final ArmSubsystem m_armSubsystem = new ArmSubsystem(
+  public final ArmSubsystem m_armSubsystem = new ArmSubsystem(
     new SmartMotorControllerGroup<>(
       IntakeConstants.kIsInverted,
       IntakeConstants.kMaxSpeed,
@@ -110,7 +110,7 @@ public class RobotContainer {
     m_endEffectorController::getLeftY
   );
 
-  private final ShoulderSubsystem m_shoulderSubsystem = new ShoulderSubsystem(
+  public final ShoulderSubsystem m_shoulderSubsystem = new ShoulderSubsystem(
     m_dashboard,
     PivotConstants.kIsInverted,
     PivotConstants.kRange,
@@ -166,10 +166,10 @@ public class RobotContainer {
       "Preload\u00bbSpeaker, Leave",
       AutoCommandFactory.SpeakerLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
     );
-    // addOption(
-    //   "Preload\u00bbSpeaker, Ground\u00bbIntake, Leave",
-    //   AutoCommandFactory.SpeakerLoadLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
-    // );
+    addOption(
+      "Preload\u00bbSpeaker, Ground\u00bbIntake, Leave",
+      AutoCommandFactory.SpeakerLoadLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
+    );
   }};
 
   public RobotContainer() {

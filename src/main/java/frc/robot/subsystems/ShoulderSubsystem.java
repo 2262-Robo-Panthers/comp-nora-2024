@@ -32,6 +32,8 @@ public class ShoulderSubsystem extends SubsystemBase {
   private double m_positionZero;
   private boolean m_isNeutralized = false;
 
+  private boolean m_shouldCheckLimits = false;
+
   private final DigitalInput m_limitSwitchLower;
   private final DigitalInput m_limitSwitchUpper;
 
@@ -70,8 +72,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     }
 
     setupPid(p, i, d);
-    setupTriggers();
-
+    setupLimitChecks();
     resetPosition(1.0);
 
     populateDashboard(shuffleboardTab);
@@ -88,18 +89,6 @@ public class ShoulderSubsystem extends SubsystemBase {
     }
   }
 
-  private void setupTriggers() {
-    new Trigger(m_limitSwitchLower::get)
-      .onFalse(new InstantCommand(() -> {
-        resetPosition(0.0);
-      }, this));
-
-    new Trigger(m_limitSwitchUpper::get)
-      .onFalse(new InstantCommand(() -> {
-        resetPosition(1.0);
-      }, this));
-  }
-
   private void populateDashboard(ShuffleboardTab dashboard) {
     ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.ShoulderInfo, "%.3f", List.of(
       new Pair<>("Requested", () -> m_positionNow * m_totalRange),
@@ -111,6 +100,27 @@ public class ShoulderSubsystem extends SubsystemBase {
       .addString("Too Far?", () -> String.join(" ",
         isAtLimitLower() ? "LWR" : "",
         isAtLimitUpper() ? "UPR" : ""));
+  }
+
+  private void setupLimitChecks() {
+    // TODO better functional code
+    new Trigger(() -> m_limitSwitchLower.get() && m_shouldCheckLimits)
+      .onFalse(new InstantCommand(() -> {
+        resetPosition(0.0);
+      }, this));
+
+    new Trigger(() -> m_limitSwitchUpper.get() && m_shouldCheckLimits)
+      .onFalse(new InstantCommand(() -> {
+        resetPosition(1.0);
+      }, this));
+  }
+
+  public void enableLimitChecks() {
+    m_shouldCheckLimits = true;
+  }
+
+  public void disableLimitChecks() {
+    m_shouldCheckLimits = false;
   }
 
   public void movePivotPosition(double positionDelta) {
