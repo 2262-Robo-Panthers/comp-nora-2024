@@ -139,8 +139,17 @@ public class DriveSubsystem extends SubsystemBase {
     usePose(new Pose2d(m_odometry.getPoseMeters().getTranslation(), rotation));
   }
 
-  public void discardGyroDrift() {
+  public void useCurrentTranslationAsOrigin() {
+    usePoseTranslation(new Translation2d(0.0, 0.0));
+  }
+
+  public void useCurrentRotationAsOrigin() {
     usePoseRotation(new Rotation2d(0.0));
+  }
+
+  public void useCurrentPoseAsOrigin() {
+    useCurrentTranslationAsOrigin();
+    useCurrentRotationAsOrigin();
   }
 
   public double getRotation_deg() {

@@ -8,7 +8,7 @@ import com.revrobotics.CANSparkBase.IdleMode;
 
 public final class Constants {
   public static class OIConstants {
-    public static final double kDeadband = 0.1;
+    public static final double kDeadband = 0.075;
 
     public static class USB {
       public static final int kDriverControllerPort = 0;
@@ -44,9 +44,9 @@ public final class Constants {
   }
 
   public static class AutoConstants {
-    // Values acquired by testing
-    public static final double kSpeakerFrontAim = 0.075;
-    public static final double kSpeakerSideAim = 0.164;
+    public static final double kSpeakerFrontAim = 0.02;
+    public static final double kSpeakerSideAim = 0.08;
+    public static final double kSpeakerNoteAim = 0.26;
 
     public static final double kIntakeDistance = Units.inchesToMeters(5.0);
 
@@ -140,13 +140,13 @@ public final class Constants {
     public static final boolean kIsInverted = true;
     public static final double kRange = 15.0;
     public static final double kHyperextension = 0.1; // 10% of total range
-    public static final double kSensitivity = 0.01;
+    public static final double kSensitivity = 0.0075;
 
-    public static final double kP = 0.8;
-    public static final double kI = 0.6;
+    public static final double kP = 6.0;
+    public static final double kI = 3.0;
     public static final double kD = 0.0;
-    public static final double kMaxSpeed = 0.2;
-    public static final double kMaxAccel = 0.2;
+    public static final double kMaxSpeed_m_s = 0.8;
+    public static final double kMaxAccel_m_s_s = 3.0;
 
     public static class CAN {
       public static final int kMotorPortA = 1;

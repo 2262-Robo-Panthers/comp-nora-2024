@@ -119,8 +119,8 @@ public class RobotContainer {
     PivotConstants.kP,
     PivotConstants.kI,
     PivotConstants.kD,
-    PivotConstants.kMaxSpeed,
-    PivotConstants.kMaxAccel,
+    PivotConstants.kMaxSpeed_m_s,
+    PivotConstants.kMaxAccel_m_s_s,
     new DigitalInput(PivotConstants.DIO.kLimitSwitchLower),
     new DigitalInput(PivotConstants.DIO.kLimitSwitchUpper),
     new TalonFX(PivotConstants.CAN.kMotorPortA),
@@ -162,16 +162,16 @@ public class RobotContainer {
 
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>() {{
     setDefaultOption(
-      "Leave",
-      AutoCommandFactory.Leave(m_driveSubsystem)
+      "Mobility",
+      AutoCommandFactory.Mobility(m_driveSubsystem)
     );
     addOption(
-      "Preload\u00bbSpeaker, Leave",
-      AutoCommandFactory.SpeakerLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
+      "Mobility + 1 Note",
+      AutoCommandFactory.MobilitySpeaker(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
     );
     addOption(
-      "Preload\u00bbSpeaker, Ground\u00bbIntake, Leave",
-      AutoCommandFactory.SpeakerLoadLeave(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
+      "Mobility + 2 Notes",
+      AutoCommandFactory.MobilitySpeakerSpeaker(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
     );
   }};
 
