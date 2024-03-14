@@ -11,7 +11,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.util.WPIUtilJNI;
@@ -127,12 +127,12 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   private void setupLimitChecks() {
     new Trigger(() -> m_limitSwitchLower.get() && m_shouldCheckLimits)
-      .onFalse(new InstantCommand(() -> {
+      .onFalse(Commands.runOnce(() -> {
         resetPosition(0.0);
       }, this));
 
     new Trigger(() -> m_limitSwitchUpper.get() && m_shouldCheckLimits)
-      .onFalse(new InstantCommand(() -> {
+      .onFalse(Commands.runOnce(() -> {
         resetPosition(1.0);
       }, this));
   }

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.revrobotics.CANSparkMax;
@@ -199,18 +199,18 @@ public class RobotContainer {
 
   private void configureBindings() {
     m_driverController.back()
-      .onTrue(new InstantCommand(() -> m_driveSubsystem.setXFormation(true), m_driveSubsystem));
+      .onTrue(Commands.runOnce(() -> m_driveSubsystem.setXFormation(true), m_driveSubsystem));
     m_driverController.start()
-      .onTrue(new InstantCommand(() -> m_driveSubsystem.setXFormation(false), m_driveSubsystem));
+      .onTrue(Commands.runOnce(() -> m_driveSubsystem.setXFormation(false), m_driveSubsystem));
 
     m_driverController.x()
-      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseTranslationX(0.0), m_driveSubsystem));
+      .onTrue(Commands.runOnce(() -> m_driveSubsystem.usePoseTranslationX(0.0), m_driveSubsystem));
     m_driverController.y()
-      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseTranslationY(0.0), m_driveSubsystem));
+      .onTrue(Commands.runOnce(() -> m_driveSubsystem.usePoseTranslationY(0.0), m_driveSubsystem));
     m_driverController.a()
-      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(0.0)), m_driveSubsystem));
+      .onTrue(Commands.runOnce(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(0.0)), m_driveSubsystem));
     m_driverController.b()
-      .onTrue(new InstantCommand(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(Math.PI)), m_driveSubsystem));
+      .onTrue(Commands.runOnce(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(Math.PI)), m_driveSubsystem));
 
     // TODO test chirps
     m_driverController.leftBumper()
@@ -227,23 +227,23 @@ public class RobotContainer {
     m_endEffectorController.povDown()
       .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kLower));
     m_endEffectorController.povLeft()
-      .onTrue(new InstantCommand(m_shoulderSubsystem::neutralizeMotors, m_shoulderSubsystem)
+      .onTrue(Commands.runOnce(m_shoulderSubsystem::neutralizeMotors, m_shoulderSubsystem)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
     m_endEffectorController.povRight()
-      .onTrue(new InstantCommand(m_shoulderSubsystem::deneutralizeMotors, m_shoulderSubsystem));
+      .onTrue(Commands.runOnce(m_shoulderSubsystem::deneutralizeMotors, m_shoulderSubsystem));
     m_endEffectorController.leftBumper()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(0.0), m_shoulderSubsystem));
+      .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.resetPosition(0.0), m_shoulderSubsystem));
     m_endEffectorController.rightBumper()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.resetPosition(1.0), m_shoulderSubsystem));
+      .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.resetPosition(1.0), m_shoulderSubsystem));
 
     m_endEffectorController.a()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.setPivotPosition(0.0), m_shoulderSubsystem));
+      .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.setPivotPosition(0.0), m_shoulderSubsystem));
     m_endEffectorController.b()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.setPivotPosition(AutoConstants.kSpeakerSideAim), m_shoulderSubsystem));
+      .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.setPivotPosition(AutoConstants.kAimSpeakerSide), m_shoulderSubsystem));
     m_endEffectorController.x()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.setPivotPosition(AutoConstants.kSpeakerFrontAim), m_shoulderSubsystem));
+      .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.setPivotPosition(AutoConstants.kAimSpeakerFront), m_shoulderSubsystem));
     m_endEffectorController.y()
-      .onTrue(new InstantCommand(() -> m_shoulderSubsystem.setPivotPosition(1.0), m_shoulderSubsystem));
+      .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.setPivotPosition(1.0), m_shoulderSubsystem));
 
     // m_endEffectorController.back()
     //   .onTrue(m_chirpManager.getSongSelectCommand(i -> i - 1));

@@ -13,8 +13,7 @@ import edu.wpi.first.networktables.BooleanTopic;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.NetworkButton;
 
 import com.ctre.phoenix6.Orchestra;
@@ -61,14 +60,14 @@ public class ChirpManager {
       .getTopic();
 
     new NetworkButton(new BooleanTopic(isEnabled))
-      .onFalse(new InstantCommand(() -> {
+      .onFalse(Commands.runOnce(() -> {
         m_isEnabled = false;
         if (m_orchestra.isPlaying()) {
           m_orchestra.pause();
           m_wasInterrupted = true;
         }
       }, m_shoulder))
-      .onTrue(new InstantCommand(() -> {
+      .onTrue(Commands.runOnce(() -> {
         m_isEnabled = true;
         if (m_wasInterrupted) {
           m_orchestra.play();
@@ -82,7 +81,7 @@ public class ChirpManager {
   }
 
   public Command getSongSelectCommand(UnaryOperator<Integer> indexCalculator) {
-    return new InstantCommand(
+    return Commands.runOnce(
       () -> {
         if (m_orchestra.isPlaying()) {
           m_orchestra.stop();
@@ -104,14 +103,14 @@ public class ChirpManager {
   }
 
   public Command getSongPlayCommand(UnaryOperator<Integer> indexCalculator) {
-    return new SequentialCommandGroup(
+    return Commands.sequence(
       getSongSelectCommand(indexCalculator),
       getPlayPauseCommand()
     );
   }
 
   public Command getPlayPauseCommand() {
-    return new InstantCommand(
+    return Commands.runOnce(
       () -> {
         if (m_orchestra.isPlaying()) {
           m_orchestra.pause();

@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
@@ -44,9 +46,10 @@ public final class Constants {
   }
 
   public static class AutoConstants {
-    public static final double kSpeakerFrontAim = 0.02;
-    public static final double kSpeakerSideAim = 0.08;
-    public static final double kSpeakerNoteAim = 0.26;
+    public static final double kAimGround       = -0.10;
+    public static final double kAimSpeakerFront = +0.02;
+    public static final double kAimSpeakerSide  = +0.08;
+    public static final double kAimSpeakerNote  = +0.26;
 
     public static final double kIntakeDistance = Units.inchesToMeters(5.0);
 
@@ -55,17 +58,38 @@ public final class Constants {
     public static final double kDistanceSpeakerToLeave = Units.inchesToMeters(39.93);
     public static final double kDistanceLeaveToNote = Units.inchesToMeters(39.90);
 
-    public static final double kDriveSpeakerToNote
-      = kDistanceSpeakerToLeave
-      + kDistanceLeaveToNote
-      - DriveConstants.kChassisLength
-      - 2 * DriveConstants.kBumperThickness
-      - kIntakeDistance
-      - kNoteOuterRadius;
+    public static final double kDistanceNoteToNote_Close = Units.inchesToMeters(57.0);
+    public static final double kDistanceNoteToNote_Far = Units.inchesToMeters(66.0);
 
-    public static final double kDriveNoteToLeave
-      = kDistanceSpeakerToLeave
-      - kDriveSpeakerToNote;
+    public static final Pose2d kPoseSpeaker = new Pose2d(
+      0.0,
+      0.0,
+      new Rotation2d(0.0));
+
+    public static final Pose2d kPoseSpeakerNote2 = new Pose2d(
+      kDistanceSpeakerToLeave
+        + kDistanceLeaveToNote
+        - DriveConstants.kChassisLength
+        - 2 * DriveConstants.kBumperThickness
+        - kIntakeDistance
+        - kNoteOuterRadius,
+      0.0,
+      new Rotation2d(0.0));
+
+    public static final Pose2d kPoseSpeakerNote1 = new Pose2d(
+      kPoseSpeakerNote2.getX(),
+      kPoseSpeakerNote2.getY()
+        + kDistanceNoteToNote_Close
+        - 0.5 * DriveConstants.kChassisLength
+        - DriveConstants.kBumperThickness
+        - kIntakeDistance
+        - kNoteOuterRadius,
+      new Rotation2d(Math.PI / 2));
+
+    public static final Pose2d kPoseSpeakerLeave = new Pose2d(
+      kDistanceSpeakerToLeave,
+      0.0,
+      new Rotation2d(0.0));
   }
 
   public static class DriveConstants {
