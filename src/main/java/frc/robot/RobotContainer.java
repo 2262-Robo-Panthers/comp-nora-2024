@@ -211,14 +211,13 @@ public class RobotContainer {
     m_driverController.b()
       .onTrue(Commands.runOnce(() -> m_driveSubsystem.usePoseRotation(new Rotation2d(Math.PI)), m_driveSubsystem));
 
-    // TODO test chirps
-    m_driverController.leftBumper()
+    m_driverController.povLeft()
       .onTrue(m_sfxManager.getSongSelectCommand(i -> i + 1));
-    m_driverController.back()
+    m_driverController.povUp()
       .onTrue(m_sfxManager.getPlayPauseCommand());
-    m_driverController.rightBumper()
+    m_driverController.povRight()
       .onTrue(m_musicManager.getSongSelectCommand(i -> i + 1));
-    m_driverController.start()
+    m_driverController.povDown()
       .onTrue(m_musicManager.getPlayPauseCommand());
 
     m_endEffectorController.povUp()

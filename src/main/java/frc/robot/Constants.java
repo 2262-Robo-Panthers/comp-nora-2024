@@ -169,7 +169,7 @@ public final class Constants {
     public static final double kP = 6.0;
     public static final double kI = 3.0;
     public static final double kD = 0.0;
-    public static final double kMaxSpeed_m_s = 0.8;
+    public static final double kMaxSpeed_m_s = 1.0;
     public static final double kMaxAccel_m_s_s = 3.0;
 
     public static class CAN {
