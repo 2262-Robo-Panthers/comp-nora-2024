@@ -24,7 +24,6 @@ import frc.robot.commands.AutoCommandFactory;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.ShoulderCommand;
 import frc.robot.commands.DriveCommand;
-import frc.robot.commands.HomeCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ShoulderSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -223,9 +222,9 @@ public class RobotContainer {
       .onTrue(m_musicManager.getPlayPauseCommand());
 
     m_endEffectorController.povUp()
-      .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kUpper));
+      .onTrue(m_shoulderSubsystem.homeCommand(ShoulderSubsystem.Extremum.kUpper));
     m_endEffectorController.povDown()
-      .onTrue(new HomeCommand(m_shoulderSubsystem, ShoulderSubsystem.Extremum.kLower));
+      .onTrue(m_shoulderSubsystem.homeCommand(ShoulderSubsystem.Extremum.kLower));
     m_endEffectorController.povLeft()
       .onTrue(Commands.runOnce(m_shoulderSubsystem::neutralizeMotors, m_shoulderSubsystem)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));

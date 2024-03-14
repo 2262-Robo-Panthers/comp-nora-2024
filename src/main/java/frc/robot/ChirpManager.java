@@ -81,44 +81,34 @@ public class ChirpManager {
   }
 
   public Command getSongSelectCommand(UnaryOperator<Integer> indexCalculator) {
-    return Commands.runOnce(
-      () -> {
-        if (m_orchestra.isPlaying()) {
-          m_orchestra.stop();
-        }
+    return Commands.runOnce(() -> {
+      if (m_orchestra.isPlaying())
+        m_orchestra.stop();
 
-        m_currentSong = indexCalculator.apply(m_currentSong);
+      m_currentSong = indexCalculator.apply(m_currentSong);
 
-        if (m_currentSong >= m_songs.length) {
-          m_currentSong = 0;
-        }
-        else if (m_currentSong < 0) {
-          m_currentSong = m_songs.length - 1;
-        }
+      if (m_currentSong >= m_songs.length)
+        m_currentSong = 0;
+      else if (m_currentSong < 0)
+        m_currentSong = m_songs.length - 1;
 
-        loadCurrentSong();
-      },
-      m_shoulder
-    );
+      loadCurrentSong();
+    }, m_shoulder);
   }
 
   public Command getSongPlayCommand(UnaryOperator<Integer> indexCalculator) {
-    return Commands.sequence(
-      getSongSelectCommand(indexCalculator),
-      getPlayPauseCommand()
-    );
+    return
+      getSongSelectCommand(indexCalculator)
+      .andThen(
+      getPlayPauseCommand());
   }
 
   public Command getPlayPauseCommand() {
-    return Commands.runOnce(
-      () -> {
-        if (m_orchestra.isPlaying()) {
-          m_orchestra.pause();
-        } else if (m_isEnabled) {
-          m_orchestra.play();
-        }
-      },
-      m_shoulder
-    );
+    return Commands.runOnce(() -> {
+      if (m_orchestra.isPlaying())
+        m_orchestra.pause();
+      else if (m_isEnabled)
+        m_orchestra.play();
+    }, m_shoulder);
   }
 }

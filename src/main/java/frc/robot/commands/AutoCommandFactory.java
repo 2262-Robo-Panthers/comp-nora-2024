@@ -62,38 +62,36 @@ public class AutoCommandFactory {
 
       .andThen(
 
-      new HomeCommand(shoulder, ShoulderSubsystem.Extremum.kLower))
+      shoulder.homeCommand(ShoulderSubsystem.Extremum.kLower))
 
       .andThen(
 
-      Commands.runOnce(() -> shoulder.setPivotPosition(AutoConstants.kAimSpeakerFront), shoulder)
+      shoulder.controlCommand(AutoConstants.kAimSpeakerFront)
       .alongWith(
       Commands.waitSeconds(2.0)))
 
       .andThen(
 
-      Commands.runOnce(() -> arm.setLaunchSpeed(1.0), arm)
+      arm.controlCommand(null, 1.0)
       .alongWith(
       Commands.waitSeconds(2.0)))
 
       .andThen(
 
-      Commands.runOnce(() -> arm.setIntakeSpeed(1.0), arm)
+      arm.controlCommand(1.0, null)
       .alongWith(
       Commands.waitSeconds(2.0)))
 
       .andThen(
 
-      Commands.runOnce(() ->
-        { arm.setLaunchSpeed(-0.01);
-          arm.setIntakeSpeed(0.0); }, arm)
+      arm.controlCommand(0.0, -0.01)
       .alongWith(
       movementHelper(drive, List.of(
         AutoConstants.kPoseSpeaker,
         AutoConstants.kPoseSpeakerLeave))))
 
       .andThen(
-      Commands.runOnce(() -> arm.setLaunchSpeed(0.0), arm));
+      arm.controlCommand(null, 0.0));
   }
 
   public static Command MobilitySpeakerSpeaker(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
@@ -102,31 +100,31 @@ public class AutoCommandFactory {
 
       .andThen(
 
-      new HomeCommand(shoulder, ShoulderSubsystem.Extremum.kLower))
+      shoulder.homeCommand(ShoulderSubsystem.Extremum.kLower))
 
       .andThen(
 
-      Commands.runOnce(() -> shoulder.setPivotPosition(AutoConstants.kAimSpeakerFront), shoulder)
+      shoulder.controlCommand(AutoConstants.kAimSpeakerFront)
       .alongWith(
       Commands.waitSeconds(1.0)))
 
       .andThen(
 
-      Commands.runOnce(() -> arm.setLaunchSpeed(1.0), arm)
+      arm.controlCommand(null, 1.0)
       .alongWith(
       Commands.waitSeconds(1.5)))
 
       .andThen(
 
-      Commands.runOnce(() -> arm.setIntakeSpeed(1.0), arm)
+      arm.controlCommand(1.0, null)
       .alongWith(
       Commands.waitSeconds(1.0)))
 
       .andThen(
 
-      Commands.runOnce(() -> arm.setLaunchSpeed(-0.01), arm)
+      arm.controlCommand(null, -0.01)
       .alongWith(
-      Commands.runOnce(() -> shoulder.setPivotPosition(-0.12), shoulder))
+      shoulder.controlCommand(AutoConstants.kAimGround))
       .alongWith(
       movementHelper(drive, List.of(
         AutoConstants.kPoseSpeaker,
@@ -136,35 +134,33 @@ public class AutoCommandFactory {
 
       .andThen(
 
-      Commands.runOnce(() -> arm.setIntakeSpeed(-0.25), arm)
+      arm.controlCommand(-0.25, null)
       .alongWith(
-      Commands.runOnce(() -> shoulder.setPivotPosition(AutoConstants.kAimSpeakerNote), shoulder))
+      shoulder.controlCommand(AutoConstants.kAimSpeakerNote))
       .alongWith(
       Commands.waitSeconds(1.0)))
 
       .andThen(
 
-      Commands.runOnce(() -> arm.setLaunchSpeed(1.0), arm)
+      arm.controlCommand(null, 1.0)
       .alongWith(
       Commands.waitSeconds(1.5)))
 
       .andThen(
 
-      Commands.runOnce(() -> arm.setIntakeSpeed(1.0), arm)
+      arm.controlCommand(1.0, null)
       .alongWith(
       Commands.waitSeconds(1.0)))
 
       .andThen(
 
-      Commands.runOnce(() ->
-        { arm.setLaunchSpeed(-0.1);
-          arm.setIntakeSpeed(0.0); }, arm)
+      arm.controlCommand(0.0, -0.1)
       .alongWith(
       Commands.waitSeconds(0.5)))
 
       .andThen(
 
-      Commands.runOnce(() -> arm.setLaunchSpeed(0.0), arm)
+      arm.controlCommand(null, 0.0)
       .alongWith(
       movementHelper(drive, List.of(
         AutoConstants.kPoseSpeakerLeave,
@@ -173,6 +169,6 @@ public class AutoCommandFactory {
       Commands.waitSeconds(0.5)))
 
       .andThen(
-      Commands.runOnce(() -> shoulder.setPivotPosition(-0.09), shoulder));
+      shoulder.controlCommand(AutoConstants.kAimGround));
   }
 }

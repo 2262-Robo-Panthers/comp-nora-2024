@@ -11,6 +11,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -22,6 +23,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import frc.robot.commands.HomeCommand;
 import frc.robot.util.ShuffleboardTabWithMaps;
 import frc.robot.Constants.ShuffleboardConstants;
 
@@ -161,6 +163,7 @@ public class ShoulderSubsystem extends SubsystemBase {
   public void resetPosition(double position) {
     m_positionZero = m_master.getPosition().getValue() - position * m_totalRange;
     setPivotPosition(position);
+    m_setpoint = m_goal;
   }
 
   public void neutralizeMotors() {
@@ -182,5 +185,13 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   public TalonFX[] getControllers() {
     return m_talons;
+  }
+
+  public Command controlCommand(double position) {
+    return runOnce(() -> setPivotPosition(position));
+  }
+
+  public Command homeCommand(Extremum direction) {
+    return new HomeCommand(this, direction);
   }
 }
