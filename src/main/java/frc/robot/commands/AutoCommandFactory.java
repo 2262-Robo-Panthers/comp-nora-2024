@@ -45,6 +45,10 @@ public class AutoCommandFactory {
   /********************************/
 
   public static Command Mobility(DriveSubsystem drive) {
+    return Mobility(drive, AutoConstants.kPoseSpeakerLeave);
+  }
+
+  public static Command Mobility(DriveSubsystem drive, Pose2d position) {
     return
       Commands.runOnce(drive::useCurrentPoseAsOrigin, drive)
 
@@ -52,11 +56,15 @@ public class AutoCommandFactory {
 
       movementHelper(drive, List.of(
         AutoConstants.kPoseSpeaker,
-        AutoConstants.kPoseSpeakerLeave
+        position
       )));
   }
 
   public static Command MobilitySpeaker(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
+    return MobilitySpeaker(drive, arm, shoulder, AutoConstants.kPoseSpeakerLeave);
+  }
+
+  public static Command MobilitySpeaker(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder, Pose2d position) {
     return
       Commands.runOnce(drive::useCurrentPoseAsOrigin, drive)
 
@@ -88,7 +96,7 @@ public class AutoCommandFactory {
       .alongWith(
       movementHelper(drive, List.of(
         AutoConstants.kPoseSpeaker,
-        AutoConstants.kPoseSpeakerLeave))))
+        position))))
 
       .andThen(
       arm.controlCommand(null, 0.0));

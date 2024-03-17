@@ -49,7 +49,7 @@ public final class Constants {
     public static final double kAimGround       = -0.10;
     public static final double kAimSpeakerFront = +0.02;
     public static final double kAimSpeakerSide  = +0.08;
-    public static final double kAimSpeakerNote  = +0.26;
+    public static final double kAimSpeakerNote  = +0.20;
 
     public static final double kIntakeDistance = Units.inchesToMeters(5.0);
 
@@ -77,37 +77,49 @@ public final class Constants {
       new Rotation2d(0.0));
 
     public static final Pose2d kPoseSpeakerNote1 = new Pose2d(
-      kPoseSpeakerNote2.getX(),
+      kPoseSpeakerNote2.getX()
+        + 0.2, // just to be safe
       kPoseSpeakerNote2.getY()
         + kDistanceNoteToNote_Close
-        - 0.5 * DriveConstants.kChassisLength
+        - 0.2 * DriveConstants.kChassisLength
         - DriveConstants.kBumperThickness
         - kIntakeDistance
         - kNoteOuterRadius,
       new Rotation2d(Math.PI / 2));
 
     public static final Pose2d kPoseSpeakerLeave = new Pose2d(
-      kDistanceSpeakerToLeave,
+      kDistanceSpeakerToLeave
+        + 0.5, // just to be safe
       0.0,
       new Rotation2d(0.0));
+
+    public static final Pose2d kPoseSpeakerLeaveLeft = new Pose2d(
+      kDistanceSpeakerToLeave
+        + 1.0,
+      -1.0,
+      new Rotation2d(-Math.PI / 3.0));
+
+    public static final Pose2d kPoseSpeakerLeaveRight = new Pose2d(
+      kPoseSpeakerLeaveLeft.getX(),
+      -kPoseSpeakerLeaveLeft.getY(),
+      new Rotation2d(Math.PI / 3.0));
   }
 
   public static class DriveConstants {
-    public static final double kMaxSpeedLin_m_s = 2.4;
+    public static final double kMaxSpeedLin_m_s = 5.0;
     public static final double kMaxSpeedAng_rad_s = 2 * Math.PI;
 
-    public static final double kSlewRateMovement = 1.8;  // 180 %/s
+    public static final double kSlewRateMovement = 1.2;  // 120 %/s
     public static final double kSlewRateDirection = 1.2; // 1.2 rad/s
     public static final double kSlewRateRotation = 2.0;  // 200 %/s
 
     public static final boolean kIsGyroReversed = false;
 
-    // TODO verify this
     public static final double kTrackWidth  = Units.inchesToMeters(25.0); // Distance between left and right wheels
     public static final double kTrackLength = Units.inchesToMeters(24.5); // Distance between front and back wheels
     public static final double kChassisWidth  = Units.inchesToMeters(28.0);
     public static final double kChassisLength = Units.inchesToMeters(28.0);
-    public static final double kBumperThickness = Units.inchesToMeters(3.0);
+    public static final double kBumperThickness = Units.inchesToMeters(3.5);
 
     // Values are offset by 1/2 to center the robot on the origin
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
@@ -166,7 +178,7 @@ public final class Constants {
     public static final double kHyperextension = 0.1; // 10% of total range
     public static final double kSensitivity = 0.0075;
 
-    public static final double kP = 6.0;
+    public static final double kP = 12.0;
     public static final double kI = 3.0;
     public static final double kD = 0.0;
     public static final double kMaxSpeed_m_s = 1.0;

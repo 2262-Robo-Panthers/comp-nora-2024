@@ -161,15 +161,31 @@ public class RobotContainer {
 
   private final SendableChooser<Command> m_autoChooser = new SendableChooser<>() {{
     setDefaultOption(
-      "Mobility",
+      "Mobility (Front)",
       AutoCommandFactory.Mobility(m_driveSubsystem)
     );
     addOption(
-      "Mobility + 1 Note",
+      "Mobility (Left)",
+      AutoCommandFactory.Mobility(m_driveSubsystem, AutoConstants.kPoseSpeakerLeaveLeft)
+    );
+    addOption(
+      "Mobility (Right)",
+      AutoCommandFactory.Mobility(m_driveSubsystem, AutoConstants.kPoseSpeakerLeaveRight)
+    );
+    addOption(
+      "Mobility + 1 Note (Front)",
       AutoCommandFactory.MobilitySpeaker(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
     );
     addOption(
-      "Mobility + 2 Notes",
+      "Mobility + 1 Note (Left)",
+      AutoCommandFactory.MobilitySpeaker(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem, AutoConstants.kPoseSpeakerLeaveLeft)
+    );
+    addOption(
+      "Mobility + 1 Note (Right)",
+      AutoCommandFactory.MobilitySpeaker(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem, AutoConstants.kPoseSpeakerLeaveRight)
+    );
+    addOption(
+      "Mobility + 2 Notes (Front)",
       AutoCommandFactory.MobilitySpeakerSpeaker(m_driveSubsystem, m_armSubsystem, m_shoulderSubsystem)
     );
   }};
