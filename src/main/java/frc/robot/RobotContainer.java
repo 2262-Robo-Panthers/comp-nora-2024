@@ -5,7 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -113,15 +113,14 @@ public class RobotContainer {
   public final ShoulderSubsystem m_shoulderSubsystem = new ShoulderSubsystem(
     m_dashboard,
     PivotConstants.kIsInverted,
-    PivotConstants.kRange,
-    PivotConstants.kHyperextension,
+    PivotConstants.kPositionLower,
+    PivotConstants.kPositionUpper,
     PivotConstants.kP,
     PivotConstants.kI,
     PivotConstants.kD,
     PivotConstants.kMaxSpeed_m_s,
     PivotConstants.kMaxAccel_m_s_s,
-    new DigitalInput(PivotConstants.DIO.kLimitSwitchLower),
-    new DigitalInput(PivotConstants.DIO.kLimitSwitchUpper),
+    new DutyCycleEncoder(PivotConstants.DIO.kEncoderPort),
     new TalonFX(PivotConstants.CAN.kMotorPortA),
     new TalonFX(PivotConstants.CAN.kMotorPortB)
   );
@@ -236,19 +235,11 @@ public class RobotContainer {
     m_driverController.povDown()
       .onTrue(m_musicManager.getPlayPauseCommand());
 
-    m_endEffectorController.povUp()
-      .onTrue(m_shoulderSubsystem.homeCommand(ShoulderSubsystem.Extremum.kUpper));
-    m_endEffectorController.povDown()
-      .onTrue(m_shoulderSubsystem.homeCommand(ShoulderSubsystem.Extremum.kLower));
     m_endEffectorController.povLeft()
       .onTrue(Commands.runOnce(m_shoulderSubsystem::neutralizeMotors, m_shoulderSubsystem)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
     m_endEffectorController.povRight()
       .onTrue(Commands.runOnce(m_shoulderSubsystem::deneutralizeMotors, m_shoulderSubsystem));
-    m_endEffectorController.leftBumper()
-      .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.resetPosition(0.0), m_shoulderSubsystem));
-    m_endEffectorController.rightBumper()
-      .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.resetPosition(1.0), m_shoulderSubsystem));
 
     m_endEffectorController.a()
       .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.setPivotPosition(0.0), m_shoulderSubsystem));

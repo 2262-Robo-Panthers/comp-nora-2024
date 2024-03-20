@@ -70,10 +70,6 @@ public class AutoCommandFactory {
 
       .andThen(
 
-      shoulder.homeCommand(ShoulderSubsystem.Extremum.kLower))
-
-      .andThen(
-
       shoulder.controlCommand(AutoConstants.kAimSpeakerFront)
       .alongWith(
       Commands.waitSeconds(2.0)))
@@ -105,10 +101,6 @@ public class AutoCommandFactory {
   public static Command MobilitySpeakerSpeaker(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
     return
       Commands.runOnce(drive::useCurrentPoseAsOrigin, drive)
-
-      .andThen(
-
-      shoulder.homeCommand(ShoulderSubsystem.Extremum.kLower))
 
       .andThen(
 

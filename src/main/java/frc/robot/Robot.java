@@ -52,17 +52,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-
-    m_robotContainer.m_shoulderSubsystem.enableLimitChecks();
   }
 
   @Override
   public void teleopPeriodic() {}
-
-  @Override
-  public void teleopExit() {
-    m_robotContainer.m_shoulderSubsystem.disableLimitChecks();
-  }
 
   @Override
   public void testInit() {

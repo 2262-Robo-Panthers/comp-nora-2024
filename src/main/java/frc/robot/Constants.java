@@ -174,9 +174,9 @@ public final class Constants {
 
   public static class PivotConstants {
     public static final boolean kIsInverted = true;
-    public static final double kRange = 15.0;
-    public static final double kHyperextension = 0.1; // 10% of total range
     public static final double kSensitivity = 0.0075;
+    public static final double kPositionLower = 716.8;
+    public static final double kPositionUpper = 0.0;
 
     public static final double kP = 12.0;
     public static final double kI = 3.0;
@@ -190,8 +190,7 @@ public final class Constants {
     }
 
     public static class DIO {
-      public static final int kLimitSwitchLower = 1;
-      public static final int kLimitSwitchUpper = 0;
+      public static final int kEncoderPort = 4;
     }
   }
 

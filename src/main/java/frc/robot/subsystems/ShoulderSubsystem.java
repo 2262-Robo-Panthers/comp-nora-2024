@@ -9,12 +9,10 @@ import java.util.List;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.util.WPIUtilJNI;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -23,29 +21,27 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import frc.robot.commands.HomeCommand;
 import frc.robot.util.ShuffleboardTabWithMaps;
 import frc.robot.Constants.ShuffleboardConstants;
 
 public class ShoulderSubsystem extends SubsystemBase {
-  private final double m_totalRange;
-  private final double m_hyperextension;
+  private final double m_positionLower;
+  private final double m_positionUpper;
+
+  private Pair<Double, Double> m_referenceA;
+  private Pair<Double, Double> m_referenceB;
+
+  private final DutyCycleEncoder m_encoder;
+
+  private boolean m_isNeutralized = false;
 
   private final PositionVoltage m_request = new PositionVoltage(0).withSlot(0);
   private final TrapezoidProfile m_profile;
   private TrapezoidProfile.State m_goal = new TrapezoidProfile.State(1.0, 0.0);
   private TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State(1.0, 0.0);
 
-  private double m_positionZero;
-  private boolean m_isNeutralized = false;
-
-  private boolean m_shouldCheckLimits = false;
-
-  private final DigitalInput m_limitSwitchLower;
-  private final DigitalInput m_limitSwitchUpper;
-
-  private TalonFX[] m_talons;
-  private TalonFX m_master;
+  private final TalonFX[] m_talons;
+  private final TalonFX m_master;
 
   private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
@@ -57,17 +53,17 @@ public class ShoulderSubsystem extends SubsystemBase {
   public ShoulderSubsystem(
     ShuffleboardTab shuffleboardTab,
     boolean isInverted,
-    double totalRange, double hyperextension,
+    double positionLower, double positionUpper,
     double p, double i, double d,
     double maxSpeed, double maxAccel,
-    DigitalInput limitSwitchLower, DigitalInput limitSwitchUpper,
+    DutyCycleEncoder encoder,
     TalonFX... talons
   ) {
-    m_totalRange = totalRange;
-    m_hyperextension = hyperextension;
+    m_positionLower = positionLower;
+    m_positionUpper = positionUpper;
 
-    m_limitSwitchLower = limitSwitchLower;
-    m_limitSwitchUpper = limitSwitchUpper;
+    m_encoder = encoder;
+
     m_talons = talons;
     m_master = talons[0];
 
@@ -83,11 +79,15 @@ public class ShoulderSubsystem extends SubsystemBase {
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxSpeed, maxAccel));
 
-    setupPid(p, i, d);
-    setupLimitChecks();
-    resetPosition(1.0);
+    // TODO magic numbers
+    m_referenceA = getPositionPair();
+    m_referenceB = new Pair<>(m_referenceA.getFirst() + 180, m_referenceA.getSecond() - 4);
 
+    setupPid(p, i, d);
     populateDashboard(shuffleboardTab);
+
+    // TEMP
+    neutralizeMotors();
   }
 
   private void setupPid(double p, double i, double d) {
@@ -103,55 +103,44 @@ public class ShoulderSubsystem extends SubsystemBase {
 
   private void populateDashboard(ShuffleboardTab dashboard) {
     ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.ShoulderInfo, "%.3f", List.of(
-      new Pair<>("Input", () -> m_goal.position * m_totalRange),
-      new Pair<>("Request", () -> m_setpoint.position * m_totalRange),
-      new Pair<>("Reported", () -> m_master.getPosition().getValue() - m_positionZero),
-      new Pair<>("Zero", () -> m_positionZero)
-    ))
-      .addDouble("Mtr 0 Temp", m_talons[0].getDeviceTemp().asSupplier()::get).getParent()
-      .addDouble("Mtr 1 Temp", m_talons[1].getDeviceTemp().asSupplier()::get).getParent()
-      .addString("Too Far?", () -> String.join(" ",
-        isAtLimitLower() ? "LWR" : "",
-        isAtLimitUpper() ? "UPR" : ""));
+      new Pair<>("Input", () -> m_goal.position),
+      new Pair<>("Request", () -> m_setpoint.position),
+      new Pair<>("Lowest", () -> absoluteToRelative(m_positionLower)),
+      new Pair<>("Uppest", () -> absoluteToRelative(m_positionUpper)),
+      new Pair<>("Absolute", this::getAbsolutePosition),
+      new Pair<>("Relative", this::getRelativePosition),
+      new Pair<>("Mtr 0 Temp", m_talons[0].getDeviceTemp().asSupplier()::get),
+      new Pair<>("Mtr 1 Temp", m_talons[1].getDeviceTemp().asSupplier()::get)
+    ));
   }
 
   @Override
   public void periodic() {
-    if (!m_isNeutralized) {
-      double currentTime = WPIUtilJNI.now() * 1e-6;
-      double elapsedTime = currentTime - m_prevTime;
-      m_prevTime = currentTime;
+    if (m_isNeutralized)
+      return;
 
-      m_setpoint = m_profile.calculate(elapsedTime, m_setpoint, m_goal);
-      m_master.setControl(m_request.withPosition(m_positionZero + m_setpoint.position * m_totalRange));
-    }
+    double currentTime = WPIUtilJNI.now() * 1e-6;
+    double elapsedTime = currentTime - m_prevTime;
+    m_prevTime = currentTime;
+    m_setpoint = m_profile.calculate(elapsedTime, m_setpoint, m_goal);
+
+    updateReferenceB();
+
+    m_master.setControl(m_request.withPosition(inputToRelative(m_setpoint.position)));
   }
 
-  private void setupLimitChecks() {
-    new Trigger(() -> m_limitSwitchLower.get() && m_shouldCheckLimits)
-      .onFalse(Commands.runOnce(() -> {
-        resetPosition(0.0);
-      }, this));
+  private void updateReferenceB() {
+    double differenceNew = m_referenceA.getFirst() - getAbsolutePosition();
+    double differenceOld = m_referenceA.getFirst() - m_referenceB.getFirst();
 
-    new Trigger(() -> m_limitSwitchUpper.get() && m_shouldCheckLimits)
-      .onFalse(Commands.runOnce(() -> {
-        resetPosition(1.0);
-      }, this));
-  }
-
-  public void enableLimitChecks() {
-    m_shouldCheckLimits = true;
-  }
-
-  public void disableLimitChecks() {
-    m_shouldCheckLimits = false;
+    if (Math.abs(differenceNew) > Math.abs(differenceOld))
+      m_referenceB = getPositionPair();
   }
 
   public void movePivotPosition(double positionDelta) {
     setPivotPosition(MathUtil.clamp(
       m_goal.position + positionDelta,
-      0.0 - m_hyperextension,
-      1.0 + m_hyperextension
+      0.0, 1.0
     ));
   }
 
@@ -160,10 +149,32 @@ public class ShoulderSubsystem extends SubsystemBase {
     m_goal.velocity = 0.0;
   }
 
-  public void resetPosition(double position) {
-    m_positionZero = m_master.getPosition().getValue() - position * m_totalRange;
-    setPivotPosition(position);
-    m_setpoint = m_goal;
+  private double getAbsolutePosition() {
+    return m_encoder.getAbsolutePosition();
+  }
+
+  private double getRelativePosition() {
+    return m_master.getPosition().getValue();
+  }
+
+  private Pair<Double, Double> getPositionPair() {
+    return new Pair<>(getAbsolutePosition(), getRelativePosition());
+  }
+
+  private double inputToAbsolute(double input) {
+    return m_positionLower + input * (m_positionUpper - m_positionLower);
+  }
+
+  private double inputToRelative(double input) {
+    return absoluteToRelative(inputToAbsolute(input));
+  }
+
+  private double absoluteToRelative(double absolute) {
+    return absolute
+      - m_referenceA.getFirst()
+      / (m_referenceB.getFirst() - m_referenceA.getFirst())
+      * (m_referenceB.getSecond() - m_referenceA.getSecond())
+      + m_referenceA.getSecond();
   }
 
   public void neutralizeMotors() {
@@ -175,23 +186,11 @@ public class ShoulderSubsystem extends SubsystemBase {
     m_isNeutralized = false;
   }
 
-  public boolean isAtLimitLower() {
-    return !m_limitSwitchLower.get();
-  }
-
-  public boolean isAtLimitUpper() {
-    return !m_limitSwitchUpper.get();
-  }
-
   public TalonFX[] getControllers() {
     return m_talons;
   }
 
   public Command controlCommand(double position) {
     return runOnce(() -> setPivotPosition(position));
-  }
-
-  public Command homeCommand(Extremum direction) {
-    return new HomeCommand(this, direction);
   }
 }
