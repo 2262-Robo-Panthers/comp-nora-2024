@@ -38,7 +38,8 @@ public final class Constants {
     public static CardMetadata DriveControl = new CardMetadata("Drive Ctrl",  0, 0, 1, 2);
     public static CardMetadata EEorControl  = new CardMetadata("EEor Ctrl",   0, 2, 1, 2);
     public static CardMetadata PoseInfo     = new CardMetadata("Pose",        1, 0, 2, 4);
-    public static CardMetadata DriveInfo    = new CardMetadata("Drive",       3, 0, 1, 4);
+    public static CardMetadata DriveInfo    = new CardMetadata("Drive",       3, 0, 1, 2);
+    public static CardMetadata ArmInfo      = new CardMetadata("Arm",         3, 2, 1, 2);
     public static CardMetadata ShoulderInfo = new CardMetadata("Shoulder",    4, 0, 1, 4);
     public static CardMetadata SfxInfo      = new CardMetadata("SFX",         5, 0, 1, 2);
     public static CardMetadata MusicInfo    = new CardMetadata("Music",       5, 2, 1, 2);
@@ -201,6 +202,10 @@ public final class Constants {
     public static class CAN {
       public static final int kMotorPortA = 3;
       public static final int kMotorPortB = 4;
+    }
+
+    public static class DIO {
+      public static final int kPhotogatePort = 3;
     }
   }
 

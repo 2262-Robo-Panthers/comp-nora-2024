@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -86,6 +87,7 @@ public class RobotContainer {
   );
 
   public final ArmSubsystem m_armSubsystem = new ArmSubsystem(
+    m_dashboard,
     new SmartMotorControllerGroup<>(
       IntakeConstants.kIsInverted,
       IntakeConstants.kMaxSpeed,
@@ -99,7 +101,8 @@ public class RobotContainer {
       (master, follower) -> follower.follow(master),
       new CANSparkMax(LaunchConstants.CAN.kMotorPortA, MotorType.kBrushless),
       new CANSparkMax(LaunchConstants.CAN.kMotorPortB, MotorType.kBrushless)
-    )
+    ),
+    new DigitalInput(IntakeConstants.DIO.kPhotogatePort)
   );
 
   private final ArmCommand m_armCommand = new ArmCommand(
@@ -235,6 +238,9 @@ public class RobotContainer {
     m_driverController.povDown()
       .onTrue(m_musicManager.getPlayPauseCommand());
 
+    m_endEffectorController.povUp()
+      .onTrue(m_armSubsystem.intakeCommand()
+      .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
     m_endEffectorController.povLeft()
       .onTrue(Commands.runOnce(m_shoulderSubsystem::neutralizeMotors, m_shoulderSubsystem)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
