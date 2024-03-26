@@ -12,55 +12,51 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.WinchSubsystem;
 import frc.robot.util.FunctionalUtil;
 import frc.robot.util.ShuffleboardTabWithMaps;
 import frc.robot.Constants.ShuffleboardConstants;
 
-public class ArmCommand extends Command {
-  private final ArmSubsystem m_arm;
+public class WinchCommand extends Command {
+  private final WinchSubsystem m_winch;
 
-  private final Supplier<Double> m_intake;
-  private final Supplier<Double> m_launch;
+  private final Supplier<Double> m_climb;
 
-  public ArmCommand(
+  public WinchCommand(
     ShuffleboardTab shuffleboardTab,
-    ArmSubsystem arm,
-    Supplier<Double> intake, Supplier<Double> launch,
+    WinchSubsystem winch,
+    Supplier<Double> climb,
     double deadband
   ) {
-    m_arm = arm;
+    m_winch = winch;
 
     UnaryOperator<Double> deadbandify = FunctionalUtil.deadbandify(deadband);
-    m_intake = FunctionalUtil.supplyThenOperate(intake, deadbandify);
-    m_launch = FunctionalUtil.supplyThenOperate(launch, deadbandify);
+    m_climb = FunctionalUtil.supplyThenOperate(climb, deadbandify);
 
     populateDashboard(shuffleboardTab);
 
-    addRequirements(arm);
+    addRequirements(winch);
   }
 
   private void populateDashboard(ShuffleboardTab dashboard) {
-    ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.EEorControl, "%.3f", List.of(
-      new Pair<>("Intake", m_intake),
-      new Pair<>("Launch", m_launch)
+    ShuffleboardTabWithMaps.addMap(dashboard, ShuffleboardConstants.ArmInfo, "%.3f", List.of(
+      new Pair<>("Climb", m_climb)
     ));
   }
 
   @Override
   public void initialize() {
-    m_arm.stop();
+    m_winch.stop();
   }
 
   @Override
   public void execute() {
-    m_arm.setIntakeSpeed(m_intake.get());
-    m_arm.setLaunchSpeed(m_launch.get());
+    m_winch.setClimbSpeed(m_climb.get());
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_arm.stop();
+    m_winch.stop();
   }
 
   @Override

@@ -24,12 +24,15 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import frc.robot.commands.AutoCommandFactory;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.ShoulderCommand;
+import frc.robot.commands.WinchCommand;
 import frc.robot.commands.DriveCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ShoulderSubsystem;
+import frc.robot.subsystems.WinchSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.lib.MAXSwerve.MAXSwerveModule;
 import frc.robot.lib.SmartMotorController.SmartMotorControllerGroup;
+import frc.robot.util.FunctionalUtil;
 import frc.robot.Constants.*;
 import frc.robot.Constants.ShuffleboardConstants.CardMetadata;
 
@@ -91,14 +94,14 @@ public class RobotContainer {
     new SmartMotorControllerGroup<>(
       IntakeConstants.kIsInverted,
       IntakeConstants.kMaxSpeed,
-      (master, follower) -> follower.follow(master),
+      FunctionalUtil.followifierSparkMax,
       new CANSparkMax(IntakeConstants.CAN.kMotorPortA, MotorType.kBrushed),
       new CANSparkMax(IntakeConstants.CAN.kMotorPortB, MotorType.kBrushed)
     ),
     new SmartMotorControllerGroup<>(
       LaunchConstants.kIsInverted,
       LaunchConstants.kMaxSpeed,
-      (master, follower) -> follower.follow(master),
+      FunctionalUtil.followifierSparkMax,
       new CANSparkMax(LaunchConstants.CAN.kMotorPortA, MotorType.kBrushless),
       new CANSparkMax(LaunchConstants.CAN.kMotorPortB, MotorType.kBrushless)
     ),
@@ -118,6 +121,7 @@ public class RobotContainer {
     PivotConstants.kIsInverted,
     PivotConstants.kPositionLower,
     PivotConstants.kPositionUpper,
+    PivotConstants.kRelativeRange,
     PivotConstants.kP,
     PivotConstants.kI,
     PivotConstants.kD,
@@ -135,6 +139,25 @@ public class RobotContainer {
       m_endEffectorController.getRightTriggerAxis() -
       m_endEffectorController.getLeftTriggerAxis(),
     PivotConstants.kSensitivity
+  );
+
+  private final WinchSubsystem m_winchSubsystem = new WinchSubsystem(
+    new SmartMotorControllerGroup<>(
+      WinchConstants.kIsInverted,
+      WinchConstants.kMaxSpeed,
+      FunctionalUtil.followifierTalonFx,
+      new TalonFX(WinchConstants.CAN.kMotorPortA),
+      new TalonFX(WinchConstants.CAN.kMotorPortB)
+    )
+  );
+
+  private final WinchCommand m_winchCommand = new WinchCommand(
+    m_dashboard,
+    m_winchSubsystem,
+    () ->
+      m_driverController.getRightTriggerAxis() -
+      m_driverController.getLeftTriggerAxis(),
+    OIConstants.kDeadband
   );
 
   private final Orchestra m_orchestra = new Orchestra();
@@ -198,6 +221,7 @@ public class RobotContainer {
     m_driveSubsystem.setDefaultCommand(m_driveCommand);
     m_armSubsystem.setDefaultCommand(m_armCommand);
     m_shoulderSubsystem.setDefaultCommand(m_shoulderCommand);
+    m_winchSubsystem.setDefaultCommand(m_winchCommand);
 
     populateDashboard();
 
@@ -239,8 +263,9 @@ public class RobotContainer {
       .onTrue(m_musicManager.getPlayPauseCommand());
 
     m_endEffectorController.povUp()
-      .onTrue(m_armSubsystem.intakeCommand()
-      .withInterruptBehavior(Command.InterruptionBehavior.kCancelSelf));
+      .onTrue(m_armSubsystem.intakeCommand());
+    m_endEffectorController.povDown()
+      .onTrue(m_armSubsystem.controlCommand(0.0, 0.0));
     m_endEffectorController.povLeft()
       .onTrue(Commands.runOnce(m_shoulderSubsystem::neutralizeMotors, m_shoulderSubsystem)
       .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
@@ -256,19 +281,10 @@ public class RobotContainer {
     m_endEffectorController.y()
       .onTrue(Commands.runOnce(() -> m_shoulderSubsystem.setPivotPosition(1.0), m_shoulderSubsystem));
 
-    // m_endEffectorController.back()
-    //   .onTrue(m_chirpManager.getSongSelectCommand(i -> i - 1));
-    // m_endEffectorController.start()
-    //   .onTrue(m_chirpManager.getSongSelectCommand(i -> i + 1));
-    // m_endEffectorController.y()
-    //   .onTrue(m_chirpManager.getPlayPauseCommand());
-
-    // m_endEffectorController.x()
-    //   .onTrue(m_sfxManager.getSongPlayCommand(__ -> 0));
-    // m_endEffectorController.a()
-    //   .onTrue(m_sfxManager.getSongPlayCommand(__ -> 1));
-    // m_endEffectorController.b()
-    //   .onTrue(m_sfxManager.getSongPlayCommand(__ -> 2));
+    m_endEffectorController.leftBumper()
+      .onTrue(Commands.runOnce(m_shoulderSubsystem::usePositionAsReferenceB));
+    m_endEffectorController.rightBumper()
+      .onTrue(Commands.runOnce(m_shoulderSubsystem::usePositionAsReferenceA));
   }
 
   public Command getAutonomousCommand() {

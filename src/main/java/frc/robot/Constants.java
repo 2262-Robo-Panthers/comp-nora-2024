@@ -38,8 +38,8 @@ public final class Constants {
     public static CardMetadata DriveControl = new CardMetadata("Drive Ctrl",  0, 0, 1, 2);
     public static CardMetadata EEorControl  = new CardMetadata("EEor Ctrl",   0, 2, 1, 2);
     public static CardMetadata PoseInfo     = new CardMetadata("Pose",        1, 0, 2, 4);
-    public static CardMetadata DriveInfo    = new CardMetadata("Drive",       3, 0, 1, 2);
-    public static CardMetadata ArmInfo      = new CardMetadata("Arm",         3, 2, 1, 2);
+    public static CardMetadata DriveInfo    = new CardMetadata("Drive",       3, 0, 1, 3);
+    public static CardMetadata ArmInfo      = new CardMetadata("Arm (Misc)",  3, 3, 1, 1);
     public static CardMetadata ShoulderInfo = new CardMetadata("Shoulder",    4, 0, 1, 4);
     public static CardMetadata SfxInfo      = new CardMetadata("SFX",         5, 0, 1, 2);
     public static CardMetadata MusicInfo    = new CardMetadata("Music",       5, 2, 1, 2);
@@ -176,8 +176,9 @@ public final class Constants {
   public static class PivotConstants {
     public static final boolean kIsInverted = true;
     public static final double kSensitivity = 0.0075;
-    public static final double kPositionLower = 716.8;
-    public static final double kPositionUpper = 0.0;
+    public static final double kPositionLower = 0.330;
+    public static final double kPositionUpper = 0.999;
+    public static final double kRelativeRange = 17.0;
 
     public static final double kP = 12.0;
     public static final double kI = 3.0;
@@ -192,6 +193,16 @@ public final class Constants {
 
     public static class DIO {
       public static final int kEncoderPort = 4;
+    }
+  }
+
+  public static class WinchConstants {
+    public static final boolean kIsInverted = false;
+    public static final double kMaxSpeed = 0.1;
+
+    public static class CAN {
+      public static final int kMotorPortA = 7;
+      public static final int kMotorPortB = 8;
     }
   }
 

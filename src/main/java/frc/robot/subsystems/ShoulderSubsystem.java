@@ -28,6 +28,9 @@ public class ShoulderSubsystem extends SubsystemBase {
   private final double m_positionLower;
   private final double m_positionUpper;
 
+  private final double m_absoluteRange;
+  private final double m_relativeRange;
+
   private Pair<Double, Double> m_referenceA;
   private Pair<Double, Double> m_referenceB;
 
@@ -54,6 +57,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     ShuffleboardTab shuffleboardTab,
     boolean isInverted,
     double positionLower, double positionUpper,
+    double relativeRange,
     double p, double i, double d,
     double maxSpeed, double maxAccel,
     DutyCycleEncoder encoder,
@@ -61,6 +65,9 @@ public class ShoulderSubsystem extends SubsystemBase {
   ) {
     m_positionLower = positionLower;
     m_positionUpper = positionUpper;
+
+    m_absoluteRange = m_positionUpper - m_positionLower;
+    m_relativeRange = relativeRange;
 
     m_encoder = encoder;
 
@@ -79,15 +86,11 @@ public class ShoulderSubsystem extends SubsystemBase {
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxSpeed, maxAccel));
 
-    // TODO magic numbers
-    m_referenceA = getPositionPair();
-    m_referenceB = new Pair<>(m_referenceA.getFirst() + 180, m_referenceA.getSecond() - 4);
+    m_referenceA = new Pair<>(m_positionUpper, getRelativePosition());
+    m_referenceB = new Pair<>(m_positionLower, m_referenceA.getSecond() - m_relativeRange);
 
     setupPid(p, i, d);
     populateDashboard(shuffleboardTab);
-
-    // TEMP
-    neutralizeMotors();
   }
 
   private void setupPid(double p, double i, double d) {
@@ -109,8 +112,11 @@ public class ShoulderSubsystem extends SubsystemBase {
       new Pair<>("Uppest", () -> absoluteToRelative(m_positionUpper)),
       new Pair<>("Absolute", this::getAbsolutePosition),
       new Pair<>("Relative", this::getRelativePosition),
-      new Pair<>("Mtr 0 Temp", m_talons[0].getDeviceTemp().asSupplier()::get),
-      new Pair<>("Mtr 1 Temp", m_talons[1].getDeviceTemp().asSupplier()::get)
+      new Pair<>("Mtr Temp", () -> 0.5 *
+        ( m_talons[0].getDeviceTemp().asSupplier().get()
+        + m_talons[1].getDeviceTemp().asSupplier().get() ))
+      // new Pair<>("Mtr 0 Temp", m_talons[0].getDeviceTemp().asSupplier()::get),
+      // new Pair<>("Mtr 1 Temp", m_talons[1].getDeviceTemp().asSupplier()::get)
     ));
   }
 
@@ -124,17 +130,7 @@ public class ShoulderSubsystem extends SubsystemBase {
     m_prevTime = currentTime;
     m_setpoint = m_profile.calculate(elapsedTime, m_setpoint, m_goal);
 
-    updateReferenceB();
-
     m_master.setControl(m_request.withPosition(inputToRelative(m_setpoint.position)));
-  }
-
-  private void updateReferenceB() {
-    double differenceNew = m_referenceA.getFirst() - getAbsolutePosition();
-    double differenceOld = m_referenceA.getFirst() - m_referenceB.getFirst();
-
-    if (Math.abs(differenceNew) > Math.abs(differenceOld))
-      m_referenceB = getPositionPair();
   }
 
   public void movePivotPosition(double positionDelta) {
@@ -149,16 +145,34 @@ public class ShoulderSubsystem extends SubsystemBase {
     m_goal.velocity = 0.0;
   }
 
+  public void usePositionAsReferenceA(boolean alsoUpdateBottom) {
+    m_referenceA = new Pair<>(getAbsolutePosition(), getRelativePosition());
+
+    if (alsoUpdateBottom)
+      m_referenceB = new Pair<>(m_referenceA.getFirst() - m_absoluteRange, m_referenceA.getSecond() - m_relativeRange);
+  }
+
+  public void usePositionAsReferenceA() {
+    usePositionAsReferenceA(true);
+  }
+
+  public void usePositionAsReferenceB(boolean alsoUpdateTop) {
+    m_referenceB = new Pair<>(getAbsolutePosition(), getRelativePosition());
+
+    if (alsoUpdateTop)
+      m_referenceA = new Pair<>(m_referenceB.getFirst() + m_absoluteRange, m_referenceB.getSecond() + m_relativeRange);
+  }
+
+  public void usePositionAsReferenceB() {
+    usePositionAsReferenceB(true);
+  }
+
   private double getAbsolutePosition() {
     return m_encoder.getAbsolutePosition();
   }
 
   private double getRelativePosition() {
     return m_master.getPosition().getValue();
-  }
-
-  private Pair<Double, Double> getPositionPair() {
-    return new Pair<>(getAbsolutePosition(), getRelativePosition());
   }
 
   private double inputToAbsolute(double input) {
@@ -170,11 +184,10 @@ public class ShoulderSubsystem extends SubsystemBase {
   }
 
   private double absoluteToRelative(double absolute) {
-    return absolute
-      - m_referenceA.getFirst()
+    return m_referenceA.getSecond()
+      + (absolute - m_referenceA.getFirst())
       / (m_referenceB.getFirst() - m_referenceA.getFirst())
-      * (m_referenceB.getSecond() - m_referenceA.getSecond())
-      + m_referenceA.getSecond();
+      * (m_referenceB.getSecond() - m_referenceA.getSecond());
   }
 
   public void neutralizeMotors() {
