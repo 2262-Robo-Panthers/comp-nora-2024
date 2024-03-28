@@ -176,8 +176,8 @@ public final class Constants {
   public static class PivotConstants {
     public static final boolean kIsInverted = true;
     public static final double kSensitivity = 0.0075;
-    public static final double kPositionLower = 0.330;
-    public static final double kPositionUpper = 0.999;
+    public static final double kPositionLower = 0.13;
+    public static final double kPositionUpper = 0.80;
     public static final double kRelativeRange = 17.0;
 
     public static final double kP = 12.0;

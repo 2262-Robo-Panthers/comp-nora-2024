@@ -168,7 +168,8 @@ public class ShoulderSubsystem extends SubsystemBase {
   }
 
   private double getAbsolutePosition() {
-    return m_encoder.getAbsolutePosition();
+    double temp = m_encoder.getAbsolutePosition() - 0.2;
+    return temp < 0.0 ? temp + 1.0 : temp;
   }
 
   private double getRelativePosition() {
