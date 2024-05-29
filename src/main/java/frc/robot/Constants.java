@@ -38,19 +38,19 @@ public final class Constants {
     public static CardMetadata DriveControl = new CardMetadata("Drive Ctrl",  0, 0, 1, 2);
     public static CardMetadata EEorControl  = new CardMetadata("EEor Ctrl",   0, 2, 1, 2);
     public static CardMetadata PoseInfo     = new CardMetadata("Pose",        1, 0, 2, 4);
-    public static CardMetadata DriveInfo    = new CardMetadata("Drive",       3, 0, 1, 3);
-    public static CardMetadata ArmInfo      = new CardMetadata("Arm (Misc)",  3, 3, 1, 1);
-    public static CardMetadata ShoulderInfo = new CardMetadata("Shoulder",    4, 0, 1, 4);
-    public static CardMetadata SfxInfo      = new CardMetadata("SFX",         5, 0, 1, 2);
-    public static CardMetadata MusicInfo    = new CardMetadata("Music",       5, 2, 1, 2);
-    public static CardMetadata AutoChooser  = new CardMetadata("Select Auto", 0, 4, 6, 1);
+    public static CardMetadata DriveInfo    = new CardMetadata("Drive",       3, 0, 1, 4);
+    public static CardMetadata ArmInfo      = new CardMetadata("Arm (Misc)",  4, 0, 1, 4);
+    public static CardMetadata ShoulderInfo = new CardMetadata("Shoulder",    5, 0, 1, 4);
+    public static CardMetadata SfxInfo      = new CardMetadata("SFX",         6, 0, 1, 3);
+    public static CardMetadata MusicInfo    = new CardMetadata("Music",       7, 0, 1, 3);
+    public static CardMetadata AutoChooser  = new CardMetadata("Select Auto", 6, 3, 4, 1);
   }
 
   public static class AutoConstants {
     public static final double kAimGround       = -0.10;
     public static final double kAimSpeakerFront = +0.02;
     public static final double kAimSpeakerSide  = +0.08;
-    public static final double kAimSpeakerNote  = +0.20;
+    public static final double kAimSpeakerNote  = +0.25;
 
     public static final double kIntakeDistance = Units.inchesToMeters(5.0);
 
@@ -110,7 +110,7 @@ public final class Constants {
     public static final double kMaxSpeedLin_m_s = 5.0;
     public static final double kMaxSpeedAng_rad_s = 2 * Math.PI;
 
-    public static final double kSlewRateMovement = 1.2;  // 120 %/s
+    public static final double kSlewRateMovement = 1.5;  // 150 %/s
     public static final double kSlewRateDirection = 1.2; // 1.2 rad/s
     public static final double kSlewRateRotation = 2.0;  // 200 %/s
 
@@ -198,7 +198,7 @@ public final class Constants {
 
   public static class WinchConstants {
     public static final boolean kIsInverted = false;
-    public static final double kMaxSpeed = 0.1;
+    public static final double kMaxSpeed = 0.2;
 
     public static class CAN {
       public static final int kMotorPortA = 7;

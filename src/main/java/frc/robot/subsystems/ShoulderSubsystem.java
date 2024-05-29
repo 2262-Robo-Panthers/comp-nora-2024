@@ -86,7 +86,7 @@ public class ShoulderSubsystem extends SubsystemBase {
 
     m_profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(maxSpeed, maxAccel));
 
-    m_referenceA = new Pair<>(m_positionUpper, getRelativePosition());
+    m_referenceA = new Pair<>(m_positionUpper, getRelativePosition() + 1.5);
     m_referenceB = new Pair<>(m_positionLower, m_referenceA.getSecond() - m_relativeRange);
 
     setupPid(p, i, d);

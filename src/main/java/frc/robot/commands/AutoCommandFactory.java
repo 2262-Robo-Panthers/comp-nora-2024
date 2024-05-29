@@ -90,9 +90,13 @@ public class AutoCommandFactory {
 
       arm.controlCommand(0.0, -0.01)
       .alongWith(
+      Commands.waitSeconds(7.5))) // TEMPORARY!!
+
+      .andThen(
+
       movementHelper(drive, List.of(
         AutoConstants.kPoseSpeaker,
-        position))))
+        position)))
 
       .andThen(
       arm.controlCommand(null, 0.0));
@@ -171,4 +175,84 @@ public class AutoCommandFactory {
       .andThen(
       shoulder.controlCommand(AutoConstants.kAimGround));
   }
+
+  // public static Command MobilitySpeakerSpeaker(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
+  //   return
+  //     Commands.runOnce(drive::useCurrentPoseAsOrigin, drive)
+
+  //     .andThen(
+
+  //     shoulder.controlCommand(AutoConstants.kAimSpeakerFront)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.0)))
+
+  //     .andThen(
+
+  //     arm.controlCommand(null, 1.0)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.5)))
+
+  //     .andThen(
+
+  //     arm.controlCommand(1.0, null)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.0)))
+
+  //     .andThen(
+
+  //     arm.controlCommand(null, -0.01))
+
+  //     .andThen(
+
+  //     arm.intakeCommand()
+  //     .alongWith(
+  //     shoulder.controlCommand(AutoConstants.kAimGround))
+  //     .alongWith(
+  //     movementHelper(drive, List.of(
+  //       AutoConstants.kPoseSpeaker,
+  //       AutoConstants.kPoseSpeakerLeave)))
+  //     .alongWith(
+  //     Commands.waitSeconds(1.5))
+  //     .raceWith(
+  //     Commands.waitSeconds(3.0))) // in the event that IntakeCommand fails
+
+  //     .andThen(
+
+  //     arm.controlCommand(0.0, 0.0)
+  //     .alongWith(
+  //     shoulder.controlCommand(AutoConstants.kAimSpeakerNote))
+  //     .alongWith(
+  //     Commands.waitSeconds(1.0)))
+
+  //     .andThen(
+
+  //     arm.controlCommand(null, 1.0)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.5)))
+
+  //     .andThen(
+
+  //     arm.controlCommand(1.0, null)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.0)))
+
+  //     .andThen(
+
+  //     arm.controlCommand(0.0, -0.1)
+  //     .alongWith(
+  //     Commands.waitSeconds(0.5)))
+
+  //     .andThen(
+
+  //     arm.controlCommand(null, 0.0)
+  //     .alongWith(
+  //     movementHelper(drive, List.of(
+  //       AutoConstants.kPoseSpeakerLeave,
+  //       AutoConstants.kPoseSpeakerNote1)))
+  //     .alongWith(
+  //     Commands.waitSeconds(0.5)))
+
+  //     .andThen(
+  //     shoulder.controlCommand(AutoConstants.kAimGround));
+  // }
 }
