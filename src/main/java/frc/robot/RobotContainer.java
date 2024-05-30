@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -105,7 +106,8 @@ public class RobotContainer {
       new CANSparkMax(LaunchConstants.CAN.kMotorPortA, MotorType.kBrushless),
       new CANSparkMax(LaunchConstants.CAN.kMotorPortB, MotorType.kBrushless)
     ),
-    new DigitalInput(IntakeConstants.DIO.kPhotogatePort)
+    new DigitalInput(IntakeConstants.DIO.kPhotogatePort),
+    new DigitalOutput(MiscConstants.DIO.kRelayPort)
   );
 
   private final ArmCommand m_armCommand = new ArmCommand(

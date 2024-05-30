@@ -18,6 +18,12 @@ public final class Constants {
     }
   }
 
+  public static class MiscConstants {
+    public static class DIO {
+      public static final int kRelayPort = 8;
+    }
+  }
+
   public static class ShuffleboardConstants {
     public static class CardMetadata {
       public final String name;
@@ -47,9 +53,9 @@ public final class Constants {
   }
 
   public static class AutoConstants {
-    public static final double kAimGround       = -0.10;
-    public static final double kAimSpeakerFront = +0.02;
-    public static final double kAimSpeakerSide  = +0.08;
+    public static final double kAimGround       = +0.00;
+    public static final double kAimSpeakerFront = +0.05;
+    public static final double kAimSpeakerSide  = +0.10;
     public static final double kAimSpeakerNote  = +0.25;
 
     public static final double kIntakeDistance = Units.inchesToMeters(5.0);
@@ -187,7 +193,7 @@ public final class Constants {
     public static final double kMaxAccel_m_s_s = 3.0;
 
     public static class CAN {
-      public static final int kMotorPortA = 1;
+      public static final int kMotorPortA = 15;
       public static final int kMotorPortB = 2;
     }
 
