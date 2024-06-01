@@ -194,10 +194,12 @@ public class ShoulderSubsystem extends SubsystemBase {
   public void neutralizeMotors() {
     m_isNeutralized = true;
     m_master.setControl(new NeutralOut());
+    System.out.println("[ MOTORS NEUTRALIZED ]");
   }
 
   public void deneutralizeMotors() {
     m_isNeutralized = false;
+    System.out.println("[ MOTORS DENEUTRALIZED ]");
   }
 
   public TalonFX[] getControllers() {
