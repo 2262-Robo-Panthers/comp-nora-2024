@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -265,7 +266,7 @@ public class RobotContainer {
       .onTrue(m_musicManager.getPlayPauseCommand());
 
     m_endEffectorController.povUp()
-      .onTrue(m_armSubsystem.intakeCommand());
+      .onTrue(m_armSubsystem.intakeCommand().andThen(getRumbleCommand()));
     m_endEffectorController.povDown()
       .onTrue(m_armSubsystem.controlCommand(0.0, 0.0));
     m_endEffectorController.povLeft()
@@ -287,6 +288,25 @@ public class RobotContainer {
       .onTrue(Commands.runOnce(m_shoulderSubsystem::usePositionAsReferenceB));
     m_endEffectorController.rightBumper()
       .onTrue(Commands.runOnce(m_shoulderSubsystem::usePositionAsReferenceA));
+  }
+
+  Command getRumbleCommand() {
+    return
+      Commands.runOnce(() -> {
+        m_driverController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0.5);
+        m_endEffectorController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0.5);
+      })
+
+      .andThen(
+
+      Commands.waitSeconds(1.0))
+
+      .andThen(
+
+      Commands.runOnce(() -> {
+        m_driverController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0.0);
+        m_endEffectorController.getHID().setRumble(GenericHID.RumbleType.kBothRumble, 0.0);
+      }));
   }
 
   public Command getAutonomousCommand() {

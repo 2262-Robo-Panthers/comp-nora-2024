@@ -53,7 +53,7 @@ public final class Constants {
   }
 
   public static class AutoConstants {
-    public static final double kAimGround       = +0.00;
+    public static final double kAimGround       = +0.02;
     public static final double kAimSpeakerFront = +0.05;
     public static final double kAimSpeakerSide  = +0.10;
     public static final double kAimSpeakerNote  = +0.25;

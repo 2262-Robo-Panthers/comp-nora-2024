@@ -101,79 +101,79 @@ public class AutoCommandFactory {
       arm.controlCommand(null, 0.0));
   }
 
-  public static Command MobilitySpeakerSpeaker(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
-    return
-      Commands.runOnce(drive::useCurrentPoseAsOrigin, drive)
+  // public static Command MobilitySpeakerSpeaker(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
+  //   return
+  //     Commands.runOnce(drive::useCurrentPoseAsOrigin, drive)
 
-      .andThen(
+  //     .andThen(
 
-      shoulder.controlCommand(AutoConstants.kAimSpeakerFront)
-      .alongWith(
-      Commands.waitSeconds(1.0)))
+  //     shoulder.controlCommand(AutoConstants.kAimSpeakerFront)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.0)))
 
-      .andThen(
+  //     .andThen(
 
-      arm.controlCommand(null, 1.0)
-      .alongWith(
-      Commands.waitSeconds(1.5)))
+  //     arm.controlCommand(null, 1.0)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.5)))
 
-      .andThen(
+  //     .andThen(
 
-      arm.controlCommand(1.0, null)
-      .alongWith(
-      Commands.waitSeconds(1.0)))
+  //     arm.controlCommand(1.0, null)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.0)))
 
-      .andThen(
+  //     .andThen(
 
-      arm.controlCommand(null, -0.01)
-      .alongWith(
-      shoulder.controlCommand(AutoConstants.kAimGround))
-      .alongWith(
-      movementHelper(drive, List.of(
-        AutoConstants.kPoseSpeaker,
-        AutoConstants.kPoseSpeakerLeave)))
-      .alongWith(
-      Commands.waitSeconds(1.5)))
+  //     arm.controlCommand(null, -0.01)
+  //     .alongWith(
+  //     shoulder.controlCommand(AutoConstants.kAimGround))
+  //     .alongWith(
+  //     movementHelper(drive, List.of(
+  //       AutoConstants.kPoseSpeaker,
+  //       AutoConstants.kPoseSpeakerLeave)))
+  //     .alongWith(
+  //     Commands.waitSeconds(1.5)))
 
-      .andThen(
+  //     .andThen(
 
-      arm.controlCommand(-0.25, null)
-      .alongWith(
-      shoulder.controlCommand(AutoConstants.kAimSpeakerNote))
-      .alongWith(
-      Commands.waitSeconds(1.0)))
+  //     arm.controlCommand(-0.25, null)
+  //     .alongWith(
+  //     shoulder.controlCommand(AutoConstants.kAimSpeakerNote))
+  //     .alongWith(
+  //     Commands.waitSeconds(1.0)))
 
-      .andThen(
+  //     .andThen(
 
-      arm.controlCommand(null, 1.0)
-      .alongWith(
-      Commands.waitSeconds(1.5)))
+  //     arm.controlCommand(null, 1.0)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.5)))
 
-      .andThen(
+  //     .andThen(
 
-      arm.controlCommand(1.0, null)
-      .alongWith(
-      Commands.waitSeconds(1.0)))
+  //     arm.controlCommand(1.0, null)
+  //     .alongWith(
+  //     Commands.waitSeconds(1.0)))
 
-      .andThen(
+  //     .andThen(
 
-      arm.controlCommand(0.0, -0.1)
-      .alongWith(
-      Commands.waitSeconds(0.5)))
+  //     arm.controlCommand(0.0, -0.1)
+  //     .alongWith(
+  //     Commands.waitSeconds(0.5)))
 
-      .andThen(
+  //     .andThen(
 
-      arm.controlCommand(null, 0.0)
-      .alongWith(
-      movementHelper(drive, List.of(
-        AutoConstants.kPoseSpeakerLeave,
-        AutoConstants.kPoseSpeakerNote1)))
-      .alongWith(
-      Commands.waitSeconds(0.5)))
+  //     arm.controlCommand(null, 0.0)
+  //     .alongWith(
+  //     movementHelper(drive, List.of(
+  //       AutoConstants.kPoseSpeakerLeave,
+  //       AutoConstants.kPoseSpeakerNote1)))
+  //     .alongWith(
+  //     Commands.waitSeconds(0.5)))
 
-      .andThen(
-      shoulder.controlCommand(AutoConstants.kAimGround));
-  }
+  //     .andThen(
+  //     shoulder.controlCommand(AutoConstants.kAimGround));
+  // }
 
   public static Command MobilitySpeakerSpeaker(DriveSubsystem drive, ArmSubsystem arm, ShoulderSubsystem shoulder) {
     return
@@ -211,9 +211,9 @@ public class AutoCommandFactory {
         AutoConstants.kPoseSpeaker,
         AutoConstants.kPoseSpeakerLeave)))
       .alongWith(
-      Commands.waitSeconds(1.5))
+      Commands.waitSeconds(0.8))
       .raceWith(
-      Commands.waitSeconds(3.0))) // in the event that IntakeCommand fails
+      Commands.waitSeconds(1.6))) // in the event that IntakeCommand fails
 
       .andThen(
 
